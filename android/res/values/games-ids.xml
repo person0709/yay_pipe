@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+    <string name="app_id">197469231763</string>
+    <string name="package_name">com.jeff_sue.yaypipe_gdx</string>
+    <string name="achievement_welcome_to_yaypipe">CgkIk7XV0N8FEAIQAQ</string>
+    <string name="achievement_the_first_step">CgkIk7XV0N8FEAIQAg</string>
+    <string name="achievement_youre_getting_there">CgkIk7XV0N8FEAIQAw</string>
+    <string name="achievement_wasnt_too_hard_eh">CgkIk7XV0N8FEAIQBA</string>
+    <string name="achievement_piping_hot">CgkIk7XV0N8FEAIQBQ</string>
+    <string name="achievement_mario_will_be_proud">CgkIk7XV0N8FEAIQBg</string>
+    <string name="achievement_novice_plumber">CgkIk7XV0N8FEAIQBw</string>
+    <string name="achievement_mediocre_plumber">CgkIk7XV0N8FEAIQCA</string>
+    <string name="achievement_professional_plumber">CgkIk7XV0N8FEAIQCQ</string>
+    <string name="achievement_expert_plumber">CgkIk7XV0N8FEAIQCg</string>
+    <string name="achievement_master_plumber">CgkIk7XV0N8FEAIQCw</string>
+    <string name="achievement_coward">CgkIk7XV0N8FEAIQDA</string>
+    <string name="achievement_its_aul_good_man">CgkIk7XV0N8FEAIQDQ</string>
+    <string name="achievement_youre_on_fire">CgkIk7XV0N8FEAIQDg</string>
+    <string name="achievement_very_resourceful">CgkIk7XV0N8FEAIQDw</string>
+    <string name="achievement_sore_finger">CgkIk7XV0N8FEAIQEA</string>
+    <string name="achievement_be_water_my_friend">CgkIk7XV0N8FEAIQEQ</string>
+    <string name="achievement_careful_planner">CgkIk7XV0N8FEAIQEg</string>
+    <string name="achievement_keep_it_up">CgkIk7XV0N8FEAIQEw</string>
+    <string name="achievement_no_pain_no_flow">CgkIk7XV0N8FEAIQFA</string>
+    <string name="achievement_try_hard">CgkIk7XV0N8FEAIQFQ</string>
+    <string name="achievement_too_much_free_time">CgkIk7XV0N8FEAIQFg</string>
+    <string name="leaderboard_high_score">CgkIk7XV0N8FEAIQGA</string>
+    <string name="leaderboard_total_play_time">CgkIk7XV0N8FEAIQFw</string>
+</resources>

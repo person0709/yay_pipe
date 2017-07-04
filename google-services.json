@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "197469231763",
+    "firebase_url": "https://yaypipe-29262833.firebaseio.com",
+    "project_id": "yaypipe-29262833",
+    "storage_bucket": "yaypipe-29262833.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197469231763:android:b127c9af2d20af4c",
+        "android_client_info": {
+          "package_name": "com.lazybean.yaypipe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "197469231763-ti5nbe4avm28ahkr18kalj94idtoo3kf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lazybean.yaypipe",
+            "certificate_hash": "C424BABBAC2692D9836785FC75532CBB0DCB711F"
+          }
+        },
+        {
+          "client_id": "197469231763-vofhts95fc5oa41r7ug9soln92okbjd4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lazybean.yaypipe",
+            "certificate_hash": "0EAC76A9B77398FCFB9FE438ADD9D244191C6409"
+          }
+        },
+        {
+          "client_id": "197469231763-ie6smphmduhtus2biehjugflj4lntd1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASoyBe4g-YpQJ3VLG2FCx-S_kW2DT1O7w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "197469231763-ie6smphmduhtus2biehjugflj4lntd1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

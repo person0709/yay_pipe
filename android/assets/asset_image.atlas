@@ -1,0 +1,189 @@
+
+asset_image.png
+format: RGBA8888
+filter: Nearest,Linear
+repeat: none
+slider
+  rotate: false
+  xy: 1, 480
+  size: 501, 25
+  orig: 501, 25
+  offset: 0, 0
+  index: -1
+tapToStart
+  rotate: false
+  xy: 1, 211
+  size: 175, 267
+  orig: 175, 267
+  offset: 0, 0
+  index: -1
+piggy
+  rotate: false
+  xy: 178, 278
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+a
+  rotate: false
+  xy: 1, 53
+  size: 152, 156
+  orig: 152, 156
+  offset: 0, 0
+  index: -1
+e
+  rotate: false
+  xy: 380, 297
+  size: 114, 181
+  orig: 114, 181
+  offset: 0, 0
+  index: -1
+itemtray
+  rotate: false
+  xy: 178, 194
+  size: 177, 82
+  split: 40, 40, 40, 40
+  orig: 177, 82
+  offset: 0, 0
+  index: -1
+y
+  rotate: false
+  xy: 155, 30
+  size: 143, 162
+  orig: 143, 162
+  offset: 0, 0
+  index: 1
+hand
+  rotate: false
+  xy: 300, 34
+  size: 100, 158
+  orig: 100, 158
+  offset: 0, 0
+  index: -1
+ex_mark
+  rotate: false
+  xy: 496, 319
+  size: 51, 159
+  orig: 51, 159
+  offset: 0, 0
+  index: -1
+y
+  rotate: false
+  xy: 549, 349
+  size: 136, 156
+  orig: 136, 156
+  offset: 0, 0
+  index: 2
+p
+  rotate: false
+  xy: 687, 351
+  size: 132, 154
+  orig: 132, 154
+  offset: 0, 0
+  index: 1
+p
+  rotate: false
+  xy: 821, 351
+  size: 125, 154
+  orig: 125, 154
+  offset: 0, 0
+  index: 2
+i
+  rotate: false
+  xy: 948, 349
+  size: 60, 156
+  orig: 60, 156
+  offset: 0, 0
+  index: -1
+coin
+  rotate: false
+  xy: 549, 224
+  size: 124, 123
+  orig: 124, 123
+  offset: 0, 0
+  index: -1
+drop
+  rotate: false
+  xy: 675, 224
+  size: 85, 123
+  orig: 85, 123
+  offset: 0, 0
+  index: -1
+pipe_bs
+  rotate: false
+  xy: 762, 249
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+animation_water
+  rotate: false
+  xy: 864, 285
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+pipe_lr
+  rotate: false
+  xy: 762, 147
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+pipe_lrtb
+  rotate: false
+  xy: 864, 183
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+pipe_rb
+  rotate: false
+  xy: 864, 81
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+pipe_rs
+  rotate: false
+  xy: 380, 195
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+pipe_tb
+  rotate: false
+  xy: 402, 93
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+redBlock
+  rotate: false
+  xy: 504, 122
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+finish_indicator
+  rotate: false
+  xy: 1, 1
+  size: 36, 50
+  orig: 36, 50
+  offset: 0, 0
+  index: -1
+shadow
+  rotate: false
+  xy: 402, 43
+  size: 32, 48
+  orig: 32, 48
+  offset: 0, 0
+  index: -1
+window
+  rotate: false
+  xy: 504, 485
+  size: 20, 20
+  split: 4, 5, 4, 4
+  orig: 20, 20
+  offset: 0, 0
+  index: -1
