@@ -175,7 +175,7 @@ public class Base64 {
      * Encodes up to three bytes of the array <var>source</var>
      * and writes the resulting four Base64 bytes to <var>destination</var>.
      * The source and destination arrays can be manipulated
-     * anywhere along their length by specifying
+     * anywhere along their blockLength by specifying
      * <var>srcOffset</var> and <var>destOffset</var>.
      * This method does not check to make sure your arrays
      * are large enough to accommodate <var>srcOffset</var> + 3 for
@@ -238,7 +238,7 @@ public class Base64 {
     /**
      * Encodes a byte array into Base64 notation.
      * Equivalent to calling
-     * {@code encodeBytes(source, 0, source.length)}
+     * {@code encodeBytes(source, 0, source.blockLength)}
      *
      * @param source The data to convert
      * @since 1.4
@@ -263,7 +263,7 @@ public class Base64 {
      *
      * @param source the data to convert
      * @param off offset in array where conversion should begin
-     * @param len length of data to convert
+     * @param len blockLength of data to convert
      * @param alphabet the encoding alphabet
      * @param doPadding is {@code true} to pad result with '=' chars
      * if it does not fall on 3 byte boundaries
@@ -274,7 +274,7 @@ public class Base64 {
         byte[] outBuff = encode(source, off, len, alphabet, Integer.MAX_VALUE);
         int outLen = outBuff.length;
 
-        // If doPadding is false, set length to truncate '='
+        // If doPadding is false, set blockLength to truncate '='
         // padding characters
         while (doPadding == false && outLen > 0) {
             if (outBuff[outLen - 1] != '=') {
@@ -291,9 +291,9 @@ public class Base64 {
      *
      * @param source the data to convert
      * @param off offset in array where conversion should begin
-     * @param len length of data to convert
+     * @param len blockLength of data to convert
      * @param alphabet is the encoding alphabet
-     * @param maxLineLength maximum length of one line.
+     * @param maxLineLength maximum blockLength of one line.
      * @return the BASE64-encoded byte array
      */
     public static byte[] encode(byte[] source, int off, int len, byte[] alphabet,
@@ -354,7 +354,7 @@ public class Base64 {
      * and writes the resulting bytes (up to three of them)
      * to <var>destination</var>.
      * The source and destination arrays can be manipulated
-     * anywhere along their length by specifying
+     * anywhere along their blockLength by specifying
      * <var>srcOffset</var> and <var>destOffset</var>.
      * This method does not check to make sure your arrays
      * are large enough to accommodate <var>srcOffset</var> + 4 for
@@ -464,7 +464,7 @@ public class Base64 {
      *
      * @param source the Base64 encoded data
      * @param off    the offset of where to begin decoding
-     * @param len    the length of characters to decode
+     * @param len    the blockLength of characters to decode
      * @return decoded data
      * @since 1.3
      * @throws Base64DecoderException
@@ -481,7 +481,7 @@ public class Base64 {
      *
      * @param source the Base64 encoded data
      * @param off    the offset of where to begin decoding
-     * @param len    the length of characters to decode
+     * @param len    the blockLength of characters to decode
      * @return decoded data
      */
     public static byte[] decodeWebSafe(byte[] source, int off, int len)
@@ -495,7 +495,7 @@ public class Base64 {
      *
      * @param source the Base64 encoded data
      * @param off the offset of where to begin decoding
-     * @param len the length of characters to decode
+     * @param len the blockLength of characters to decode
      * @param decodabet the decodabet for decoding Base64 content
      * @return decoded data
      */

@@ -2,75 +2,51 @@ package com.lazybean.yaypipe.gui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.utils.Align;
+import com.lazybean.yaypipe.GameWorld;
+import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.Colour;
-import com.lazybean.yaypipe.gamehelper.GridSize;
+import com.lazybean.yaypipe.gamehelper.CustomColor;
+import com.lazybean.yaypipe.gamehelper.IconType;
 
 public class ZoomUI extends Table {
-    private Icon zoomIn, zoomOut;
-    private boolean isZoomIn = false;
-    private boolean isZoomOut = false;
+    private GameWorld gameWorld;
+    private Icon zoomInIcon, zoomOutIcon;
 
-    public ZoomUI(AssetLoader assetLoader){
-        if (AssetLoader.prefs.getInteger("gridSize") < GridSize.LARGE){
-            return;
-        }
+    public ZoomUI(AssetLoader assetLoader, GameWorld gameWorld){
+        this.gameWorld = gameWorld;
+
         align(Align.bottomRight);
         //setDebug(true);
 
-        setWidth(Gdx.graphics.getWidth());
-        zoomIn = new Icon(assetLoader.circle, assetLoader.zoomIn);
-        Color color = new Color(Colour.BLUEGREY);
-        zoomIn.setColor(color.r, color.g, color.b, 0.7f);
-        zoomIn.addListener(new InputListener(){
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
+        setWidth(YayPipe.SCREEN_WIDTH);
+        zoomInIcon = new Icon(assetLoader, IconType.ZOOM_IN, Icon.ITEM_DIAMETER);
+        Color color = new Color(CustomColor.BLUEGREY.getColor());
+        zoomInIcon.setColor(color.r, color.g, color.b, 0.7f);
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                isZoomIn = true;
-            }
-        });
+        zoomOutIcon = new Icon(assetLoader, IconType.ZOOM_OUT, Icon.ITEM_DIAMETER);
+        zoomOutIcon.setColor(color.r, color.g, color.b, 0.7f);
 
-        zoomOut = new Icon(assetLoader.circle, assetLoader.zoomOut);
-        zoomOut.setColor(color.r, color.g, color.b, 0.7f);
-        zoomOut.addListener(new InputListener(){
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                isZoomOut = true;
-            }
-        });
-
-        add(zoomIn).padRight(Value.percentWidth(0.1f));
-        add(zoomOut).padRight(Gdx.graphics.getWidth()*0.09f);
+        add(zoomInIcon).padRight(Value.percentWidth(0.1f));
+        add(zoomOutIcon).padRight(YayPipe.SCREEN_WIDTH*0.09f);
     }
 
-    public void setZoomIn(boolean bool){
-        isZoomIn = bool;
-    }
+    @Override
+    public void act(float delta) {
+        if (zoomInIcon.isTouched()){
+            zoomInIcon.setTouched(false);
+            if (((OrthographicCamera) gameWorld.getGameWorldStage().getCamera()).zoom >= 0.7f) {
+                ((OrthographicCamera) gameWorld.getGameWorldStage().getCamera()).zoom -= 0.15f;
+            }
+        }
 
-    public boolean isZoomIn(){
-        return isZoomIn;
-    }
-
-    public void setZoomOut(boolean bool){
-        isZoomOut = bool;
-    }
-
-    public boolean isZoomOut(){
-        return isZoomOut;
+        if (zoomOutIcon.isTouched()){
+            zoomOutIcon.setTouched(false);
+            gameWorld.returnToPresetView();
+        }
     }
 //
 //    @Override

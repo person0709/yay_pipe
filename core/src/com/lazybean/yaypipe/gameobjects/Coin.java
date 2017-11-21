@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 
 public class Coin extends Actor{
@@ -12,14 +13,15 @@ public class Coin extends Actor{
 
     public Coin(AssetLoader assetLoader){
         image = assetLoader.coin;
-        setSize(Gdx.graphics.getWidth() * 0.05f, Gdx.graphics.getWidth() * 0.05f);
+        setSize(YayPipe.SCREEN_WIDTH * 0.05f, YayPipe.SCREEN_WIDTH * 0.05f);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        Color color = new Color(batch.getColor());
-        batch.setColor(getColor());
+        Color color = getColor();
+        batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
         batch.draw(image, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
-        batch.setColor(color);
+
+        batch.setColor(Color.WHITE);
     }
 }

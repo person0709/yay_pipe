@@ -7,8 +7,8 @@ public interface PlayService {
     void signIn();
     void signOut();
     void rateGame();
-    void unlockAchievement(int order);
-    void incrementAchievement(int order);
+    void unlockAchievement(AchievementType achievementType);
+    void incrementAchievement(AchievementType achievementType, int count);
     void submitScore(int highScore);
     void showAchievement();
     void showLeaderBoards();

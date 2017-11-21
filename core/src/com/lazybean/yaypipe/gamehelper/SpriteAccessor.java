@@ -2,6 +2,7 @@ package com.lazybean.yaypipe.gamehelper;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Align;
 
 import aurelienribon.tweenengine.TweenAccessor;
 
@@ -11,6 +12,7 @@ public class SpriteAccessor implements TweenAccessor<Actor> {
     public static final int ALPHA = 1;
     public static final int SCALE = 2;
     public static final int COLOUR = 3;
+    public static final int CENTRE_POSITION = 4;
 
     @Override
     public int getValues(Actor target, int tweenType, float[] returnValues) {
@@ -32,6 +34,11 @@ public class SpriteAccessor implements TweenAccessor<Actor> {
                 returnValues[0] = target.getColor().r;
                 returnValues[1] = target.getColor().g;
                 returnValues[2] = target.getColor().b;
+                return 3;
+
+            case CENTRE_POSITION:
+                returnValues[0] = target.getOriginX();
+                returnValues[1] = target.getOriginY();
 
             default:
                 assert false;
@@ -57,6 +64,10 @@ public class SpriteAccessor implements TweenAccessor<Actor> {
 
             case COLOUR:
                 target.setColor(newValues[0], newValues[1], newValues[2], 1);
+                break;
+
+            case CENTRE_POSITION:
+                target.setPosition(newValues[0], newValues[1], Align.center);
         }
     }
 }

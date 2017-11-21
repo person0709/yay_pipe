@@ -25,16 +25,6 @@ public class Background extends Actor {
         setTouchable(Touchable.disabled);
     }
 
-    public void readyFadeIn(){
-        Color color = new Color(getColor());
-        setColor(color.r, color.g, color.b, 0f);
-    }
-
-    public void readyFadeOut(){
-        Color color = new Color(getColor());
-        setColor(color.r, color.g, color.b, 1f);
-    }
-
     public void setAlpha(float alpha){
         Color color = new Color(getColor());
         setColor(color.r, color.g, color.b, alpha);
@@ -42,9 +32,10 @@ public class Background extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        Color color = batch.getColor();
-        batch.setColor(getColor());
+        Color color = getColor();
+        batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
         batch.draw(background, getX(), getY(), getWidth(), getHeight());
-        batch.setColor(color);
+
+        batch.setColor(Color.WHITE);
     }
 }

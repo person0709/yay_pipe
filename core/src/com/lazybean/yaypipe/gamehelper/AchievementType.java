@@ -1,0 +1,24 @@
+package com.lazybean.yaypipe.gamehelper;
+
+public enum AchievementType {
+    WELCOME,
+    TOO_EASY,
+    START_PLUMBING,
+    NOT_HARD_ENOUGH,
+    PIPING_HOT,
+    MARIO_WILL_BE_PROUD,
+    NOVICE_PLUMBER,
+    MEDIOCRE_PLUMBER,
+    PROFESSIONAL_PLUMBER,
+    EXPERT_PLUMBER,
+    MASTER_PLUMBER,
+    COWARD,
+    THINGS_HAPPEN,
+    ON_FIRE,
+    VERY_RESOURCEFUL,
+    SORE_FINGER,
+    BE_WATER_MY_FRIEND,
+    CAREFUL_PLANNER,
+    PLAY_TIME,
+    TOO_MUCH_FREE_TIME
+}

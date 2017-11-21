@@ -1,80 +1,167 @@
 package com.lazybean.yaypipe.gui;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
+import com.lazybean.yaypipe.GameWorld;
+import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gameobjects.ItemTray;
-import com.lazybean.yaypipe.gameobjects.Snail;
-import com.lazybean.yaypipe.gameobjects.Wand;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
+import com.lazybean.yaypipe.gamehelper.GameState;
+import com.lazybean.yaypipe.gamehelper.SoundType;
+import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
+import com.lazybean.yaypipe.gameobjects.NextBlock;
+import com.lazybean.yaypipe.gameobjects.WandBlock;
+
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Timeline;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Elastic;
+import aurelienribon.tweenengine.equations.Quart;
 
 public class Gui {
+    private GameWorld gameWorld;
+
+    private TweenManager tweenManager;
     private AssetLoader assetLoader;
     private Stage guiStage;
 
-    private Background background;
+    public GamePlayUpperBarUI upperBarUI;
+    public NextPipeUI nextPipeUI;
+    public ItemTray itemTray;
+    public BadgeIndicator badgeIndicator;
+    public ZoomUI zoomUI;
 
-    private ItemTray itemTray;
-    private BadgeIndicator badgeIndicator;
-    private ZoomUI zoomUI;
+    private GamePausedWindow pausedWindow;
+    public GameOverWindow gameOverWindow;
 
-    public Gui(Stage guiStage, AssetLoader assetLoader, SpriteBatch batch){
+    public Gui(Stage guiStage, GameWorld gameWorld, AssetLoader assetLoader){
         this.assetLoader = assetLoader;
         this.guiStage = guiStage;
+        this.gameWorld = gameWorld;
+
+        tweenManager = new TweenManager();
+
+        itemTrayInit();
+        upperBarUIInit();
+        nextPipeUIInit();
+        badgeIndicatorInit();
+        zoomUIInit();
+        gamePausedWindowInit();
+
+        ready();
     }
 
     private void itemTrayInit() {
-        Snail snail = new Snail(AssetLoader.prefs.getBoolean("snail"));
-
-        Wand wand = new Wand(assetLoader, AssetLoader.prefs.getInteger("wandStock"));
-
-        itemTray = new ItemTray(assetLoader, snail, wand);
-
-        if (!snail.isAvailable()) {
-            itemTray.disableSnail();
-        }
-        if (!wand.isAvailable()) {
-            itemTray.disableWand();
-        }
-
-        if (AssetLoader.prefs.getBoolean("itemUnlocked")) {
+//        if (GameData.getInstance().unlock.isItemUnlocked()) {
+            itemTray = new ItemTray(assetLoader, gameWorld);
             guiStage.addActor(itemTray);
-        }
+//        }
     }
 
     private void nextPipeUIInit() {
-        nextPipeUI = new Group();
-
+        nextPipeUI = new NextPipeUI(gameWorld, assetLoader);
+        guiStage.addActor(nextPipeUI);
     }
 
     private void upperBarUIInit() {
-        upperBarUI = new UpperBarUI(assetLoader);
-        upperBarUI.setForGamePlayScreen();
-        gameUI.addActor(upperBarUI);
+        upperBarUI = new GamePlayUpperBarUI(assetLoader, gameWorld);
+        guiStage.addActor(upperBarUI);
     }
 
-    private void badgeIndicatorInit(Array<Icon> badgeArray) {
-        badgeIndicator = new BadgeIndicator(assetLoader, badgeArray);
+    private void badgeIndicatorInit() {
+        badgeIndicator = new BadgeIndicator(assetLoader, gameWorld.difficulty.stopNum);
         badgeIndicator.setBounds(0, upperBarUI.getY() - upperBarUI.getHeight()*0.5f ,
-                Gdx.graphics.getWidth(), upperBarUI.getHeight() * 0.5f);
-        gameUI.addActor(badgeIndicator);
+                YayPipe.SCREEN_WIDTH, upperBarUI.getHeight() * 0.5f);
+        guiStage.addActor(badgeIndicator);
     }
 
     private void zoomUIInit() {
-        zoomUI = new ZoomUI(assetLoader);
+        zoomUI = new ZoomUI(assetLoader, gameWorld);
         zoomUI.setPosition(0,nextPipeUI.getTop());
-        gameUI.addActor(zoomUI);
+        guiStage.addActor(zoomUI);
     }
 
-    private void gamePausedUIInit(){
-        gamePausedUI = new GamePausedWindow(assetLoader);
-        gamePausedUI.window.setScale(0f);
-        gamePausedUI.setVisible(false);
+    private void gamePausedWindowInit(){
+        pausedWindow = new GamePausedWindow(assetLoader, gameWorld);
     }
 
-    public void render(){
+    public void showPausedWindow(){
+        pausedWindow.show(guiStage);
+    }
 
+    public void showGameOverWindow(boolean isClear) {
+        gameOverWindow = new GameOverWindow(assetLoader, isClear, gameWorld);
+        upperBarUI.remove();
+        nextPipeUI.remove();
+        badgeIndicator.remove();
+        zoomUI.remove();
+        if (itemTray != null){
+            itemTray.remove();
+        }
+        gameWorld.returnToPresetView();
+        gameOverWindow.show(guiStage);
+    }
+
+    public void update(float delta) {
+        guiStage.act(delta);
+        tweenManager.update(delta);
+    }
+
+    private void ready(){
+        TapToStart tapToStart = new TapToStart(assetLoader, gameWorld, this);
+        guiStage.addActor(tapToStart);
+    }
+
+    public void start(){
+        nextPipeUI.start();
+    }
+
+    public void useWand(WandDrawer drawer, final WandBlock movingBlock){
+        //decease stock by 1
+        gameWorld.wand.setStock(gameWorld.wand.getStock() - 1);
+        if (!gameWorld.wand.isAvailable()){
+            itemTray.disableWand();
+        }
+        else {
+            itemTray.wandStock.setBadgeLabel("x" + String.valueOf(gameWorld.wand.getStock()));
+        }
+
+        final NextBlock movingBlockClone = assetLoader.blockFactory.obtainNextBlock();
+        movingBlockClone.setPipe(assetLoader.getPipeImage(movingBlock.getPipe().getType()), movingBlock.getPipe().getType());
+
+        Vector2 srcPos = movingBlock.localToStageCoordinates(new Vector2());
+        movingBlockClone.setPosition(srcPos.x, srcPos.y);
+        guiStage.addActor(movingBlockClone);
+
+        Timeline.createParallel()
+                .push(Tween.to(drawer.drawerCircle, SpriteAccessor.SCALE, 0.2f).target(0f))
+                .push(Tween.to(drawer.fadeInOut, SpriteAccessor.ALPHA, 0.2f).target(0f))
+                .push(Tween.to(movingBlockClone, SpriteAccessor.POSITION, 0.2f).target(nextPipeUI.redBlock.getX() + NextPipeUI.RED_BLOCK_LINE_LENGTH,
+                        nextPipeUI.redBlock.getY() + NextPipeUI.RED_BLOCK_LINE_LENGTH))
+                .push(Tween.to(movingBlockClone, SpriteAccessor.SCALE, 0.2f).target(0.8f)
+                        .setCallback(new TweenCallback() {
+                            @Override
+                            public void onEvent(int type, BaseTween<?> source) {
+                                gameWorld.getGrid().setTouchable(Touchable.enabled);
+                                nextPipeUI.set(0, movingBlockClone.getPipe());
+                                movingBlockClone.remove();
+                            }
+                        }).setCallbackTriggers(TweenCallback.END))
+                .start(tweenManager);
+    }
+
+    public Stage getGuiStage() {
+        return guiStage;
+    }
+
+    public void dispose(){
+        guiStage.dispose();
     }
 }

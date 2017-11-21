@@ -5,37 +5,29 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.Colour;
-import com.lazybean.yaypipe.gamehelper.Difficulty;
-import com.lazybean.yaypipe.gamehelper.GridSize;
-import com.lazybean.yaypipe.gui.Background;
+import com.lazybean.yaypipe.gamehelper.IconType;
+import com.lazybean.yaypipe.gamehelper.SoundType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
-import com.lazybean.yaypipe.gui.Gui;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
+import com.lazybean.yaypipe.gamehelper.StatisticsType;
 import com.lazybean.yaypipe.gui.Icon;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gui.QuitWindow;
@@ -44,23 +36,20 @@ import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
-import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Back;
-import aurelienribon.tweenengine.equations.Quart;
 import aurelienribon.tweenengine.equations.Sine;
 
 public class MainMenuScreen extends GameScreen{
-    private Stage stage;
     private AssetLoader assetLoader;
-    private TweenManager tweenManager;
 
     private QuitWindow quitWindow;
 
     private Icon settings;
+    private Label highScoreLabel;
 
-    private Image e;
+    private Image y_1, a, y_2, ex_mark, p_1, i, p_2, e;
+    private Vector2 dropStartPos;
     private Actor drop;
-    private Vector2 pipePos = new Vector2();
     private Animation<TextureRegion> inPipe, splash;
     private float pipeAnimationStateTime = 0;
     private float splashAnimationStateTime = 0;
@@ -68,65 +57,47 @@ public class MainMenuScreen extends GameScreen{
     private boolean isDropFinished = false;
     private boolean splashAnimationStart = false;
 
-    private Sound waterDropSound = Gdx.audio.newSound(Gdx.files.internal("waterDrop.ogg"));
-    public MainMenuScreen(YayPipe game) {
-        super(game);
-        stage = new Stage(new ScreenViewport());
-        assetLoader = game.assetLoader;
+//    private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-        Gdx.input.setCatchBackKey(true);
-        this.tweenManager = new TweenManager();
+    public MainMenuScreen(YayPipe passedGame) {
+        super(passedGame, YayPipe.BACKGROUND_COLOUR);
+        assetLoader = passedGame.assetLoader;
 
         quitWindow = new QuitWindow(assetLoader);
 
-        InputProcessor inputProcessor = new InputAdapter(){
-            @Override
-            public boolean keyUp(int keycode) {
-                if (keycode == Input.Keys.BACK){
-                    quitWindow.show(stage);
-                }
-                return true;
-            }
-        };
-
-        InputMultiplexer multiplexer = new InputMultiplexer(stage, inputProcessor);
-        Gdx.input.setInputProcessor(multiplexer);
-
-        settings = new Icon(assetLoader.circle, assetLoader.settings);
+        settings = new Icon(assetLoader, IconType.SETTINGS, Icon.MENU_DIAMETER);
         settings.setColor(Color.BLACK);
         settings.setDiameter(settings.getHeight() * 0.8f);
-        settings.setPosition(Gdx.graphics.getWidth() - settings.getWidth() * 1.2f, Gdx.graphics.getHeight() - settings.getHeight() * 1.2f);
+        settings.setPosition(YayPipe.SCREEN_WIDTH - settings.getWidth() * 1.2f, YayPipe.SCREEN_HEIGHT - settings.getHeight() * 1.2f);
 
         stage.addActor(settings);
-    }
 
-    public void show() {
         Group yay = new Group();
         yay.setWidth(Gdx.graphics.getWidth() * 0.6f);
         yay.setHeight(Gdx.graphics.getHeight() * 0.14f);
 
-        Image y_1 = new Image(assetLoader.y_1);
+        y_1 = new Image(assetLoader.y_1);
         y_1.setWidth(yay.getWidth() * 0.33f);
         y_1.setAlign(Align.bottom);
         y_1.setScaling(Scaling.fillX);
         y_1.setScale(0f);
         y_1.setOrigin(y_1.getWidth() / 2, yay.getHeight()/2);
 
-        Image a = new Image(assetLoader.a);
+        a = new Image(assetLoader.a);
         a.setWidth(yay.getWidth() * 0.35f);
         a.setAlign(Align.bottom);
         a.setScaling(Scaling.fillX);
         a.setScale(0f);
         a.setOrigin(a.getWidth() / 2, yay.getHeight()/2);
 
-        Image y_2 = new Image(assetLoader.y_2);
+        y_2 = new Image(assetLoader.y_2);
         y_2.setWidth(yay.getWidth() * 0.32f);
         y_2.setAlign(Align.bottom);
         y_2.setScaling(Scaling.fillX);
         y_2.setScale(0f);
         y_2.setOrigin(y_2.getWidth() / 2, yay.getHeight()/2);
 
-        Image ex_mark = new Image(assetLoader.ex_mark);
+        ex_mark = new Image(assetLoader.ex_mark);
         ex_mark.setWidth(yay.getWidth() * 0.117f);
         ex_mark.setAlign(Align.bottom);
         ex_mark.setScaling(Scaling.fillX);
@@ -142,46 +113,174 @@ public class MainMenuScreen extends GameScreen{
         ex_mark.setPosition(y_2.getRight() + ex_mark.getWidth() * 0.1f, 0);
 
 
-        Group pipe = new Group();
-        pipe.setWidth(Gdx.graphics.getWidth() * 0.6f);
-        pipe.setHeight(Gdx.graphics.getHeight() * 0.14f);
+        final Table pipe = new Table();
+        pipe.setWidth(YayPipe.SCREEN_WIDTH * 0.6f);
 
-        Image p_1 = new Image(assetLoader.p_1);
-        p_1.setWidth(pipe.getWidth() * 0.3f);
-        p_1.setAlign(Align.top);
+        p_1 = new Image(assetLoader.p_1);
         p_1.setScaling(Scaling.fillX);
         p_1.setScale(0f);
-        p_1.setOrigin(p_1.getWidth() / 2, 0);
+        p_1.setOrigin(p_1.getWidth() / 2, p_1.getHeight() / 2);
 
-        Image i = new Image(assetLoader.i);
-        i.setWidth(pipe.getWidth() * 0.14f);
-        i.setAlign(Align.top);
+        i = new Image(assetLoader.i);
         i.setScaling(Scaling.fillX);
         i.setScale(0f);
-        i.setOrigin(i.getWidth() / 2, 0);
+        i.setOrigin(i.getWidth() / 2, i.getHeight() / 2);
 
-        Image p_2 = new Image(assetLoader.p_2);
-        p_2.setWidth(pipe.getWidth() * 0.29f);
-        p_2.setAlign(Align.top);
+        p_2 = new Image(assetLoader.p_2);
         p_2.setScaling(Scaling.fillX);
         p_2.setScale(0f);
-        p_2.setOrigin(p_2.getWidth() / 2, 0);
+        p_2.setOrigin(p_2.getWidth() / 2, p_2.getHeight() / 2);
 
         e = new Image(assetLoader.e);
         e.setWidth(pipe.getWidth() * 0.26f);
-        e.setAlign(Align.top);
         e.setScaling(Scaling.fillX);
         e.setScale(0f);
-        e.setOrigin(e.getWidth() / 2, 0);
+        e.setOrigin(e.getWidth() / 2, e.getHeight() / 2);
+        e.layout();
 
-        pipe.addActor(p_1);
-        p_1.setPosition(p_1.getWidth() * 0.05f, pipe.getTop() - p_1.getHeight());
-        pipe.addActor(i);
-        i.setPosition(p_1.getRight() + p_1.getWidth() * 0.05f, pipe.getTop() - i.getHeight());
-        pipe.addActor(p_2);
-        p_2.setPosition(i.getRight() + i.getWidth() * 0.07f, pipe.getTop() - p_2.getHeight());
-        pipe.addActor(e);
-        e.setPosition(p_2.getRight() + p_2.getWidth() * 0.03f, pipe.getTop() - e.getHeight());
+        pipe.add(p_1).width(Value.percentWidth(0.3f, pipe)).padRight(Value.percentWidth(0.05f)).align(Align.topLeft);
+        pipe.add(i).width(Value.percentWidth(0.14f, pipe)).padRight(Value.percentWidth(0.05f)).align(Align.topLeft);
+        pipe.add(p_2).width(Value.percentWidth(0.29f, pipe)).padRight(Value.percentWidth(0.05f)).align(Align.topLeft);
+        pipe.add(e).width(Value.percentWidth(0.26f, pipe)).align(Align.topLeft);
+
+
+        TextButton newGame = new TextButton("NEW GAME", assetLoader.uiSkin, "mainMenu");
+        newGame.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.log("NewGame", "Touched");
+                assetLoader.getSound(SoundType.CLICK).play(GameData.getInstance().getSoundVolume());
+                game.setScreen(game.screenManager.getGameSetUpScreen());
+
+            }
+        });
+
+        TextButton achievement = new TextButton("ACHIEVEMENT", assetLoader.uiSkin, "mainMenu");
+        achievement.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                assetLoader.getSound(SoundType.CLICK).play(GameData.getInstance().getSoundVolume());
+                YayPipe.playService.showAchievement();
+            }
+        });
+//
+//        TextButton statistics = new TextButton("STATISTICS", assetLoader.uiSkin, "mainMenu");
+//        statistics.addListener(new ChangeListener() {
+//            @Override
+//            public void changed(ChangeEvent event, Actor actor) {
+//                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
+//                dispose();
+//                game.setScreen(new StatisticsScreen(game, assetLoader));
+//            }
+//        });
+
+        // TODO: 11/09/2016 purchase test
+        TextButton test = new TextButton("TEST", assetLoader.uiSkin, "mainMenu");
+        test.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                YayPipe.playService.removeAds();
+            }
+        });
+
+        highScoreLabel = new Label("", assetLoader.uiSkin, "mainMenuHighScore");
+        highScoreLabel.setAlignment(Align.top);
+
+        Table table = new Table();
+        table.setFillParent(true);
+        table.add(yay).size(yay.getWidth(), yay.getHeight()).padTop(YayPipe.SCREEN_HEIGHT * 0.2f).align(Align.center);
+        table.row();
+        table.add(pipe).size(YayPipe.SCREEN_WIDTH * 0.6f, e.getImageHeight()).padTop(yay.getHeight() * 0.5f).align(Align.top).expandY();
+        table.row();
+        table.add(newGame).padTop(YayPipe.SCREEN_HEIGHT * 0.1f);
+        table.row();
+//        table.add(statistics);
+//        table.row();
+        table.add(achievement);
+        table.row();
+        table.add(test).padBottom(Value.percentHeight(0.5f));
+        table.row();
+        table.add(highScoreLabel).height(YayPipe.SCREEN_HEIGHT * 0.2f);
+
+        stage.addActor(table);
+
+        table.validate();
+
+        dropStartPos = new Vector2(pipe.getX() + pipe.getWidth() * 0.95f, pipe.getTop() - e.getImageHeight());
+
+        drop = new Actor(){
+            @Override
+            public void draw(Batch batch, float parentAlpha) {
+                Color color = new Color(batch.getColor());
+                batch.setColor(drop.getColor());
+                batch.draw(assetLoader.waterDrop, getX() - getWidth() / 2, getY() - getHeight(), getWidth(), getHeight());
+                batch.setColor(color);
+            }
+        };
+        drop.setSize(e.getImageHeight() * 0.4f, e.getImageHeight() * 0.4f);
+
+        Tween.set(drop, SpriteAccessor.ALPHA).target(0f).start(tweenManager);
+        stage.addActor(drop);
+
+
+        Actor inPipeActor = new Actor(){
+            @Override
+            public void act(float delta) {
+                if (isAnimationStart) {
+                    pipeAnimationStateTime += delta;
+                }
+            }
+
+            @Override
+            public void draw(Batch batch, float parentAlpha) {
+                if (isAnimationStart) {
+                    batch.draw(inPipe.getKeyFrame(pipeAnimationStateTime, false), getX(), getY(), getWidth(), getHeight());
+                }
+            }
+        };
+        inPipeActor.setSize(e.getImageWidth() * 0.4f, e.getImageWidth() * 0.4f);
+        inPipeActor.setPosition(dropStartPos.x, dropStartPos.y, Align.top);
+
+        stage.addActor(inPipeActor);
+
+        Actor splashActor = new Actor(){
+            @Override
+            public void act(float delta) {
+                if (isAnimationStart && splashAnimationStart) {
+                    splashAnimationStateTime += delta;
+                }
+            }
+
+            @Override
+            public void draw(Batch batch, float parentAlpha) {
+                if (isAnimationStart && splashAnimationStart)
+                    batch.draw(splash.getKeyFrame(splashAnimationStateTime, false),
+                            getX(), getY(), getWidth(), getHeight());
+            }
+        };
+        splashActor.setSize(e.getImageHeight() * 0.4f, e.getImageHeight() * 0.4f);
+        splashActor.setPosition(dropStartPos.x, 0, Align.bottom);
+
+        stage.addActor(splashActor);
+
+        inPipe = new Animation(0.7f / 9f, assetLoader.manager.get("pipe_drop_anim.atlas", TextureAtlas.class).findRegions("drop"));
+        splash = new Animation(0.05f, assetLoader.manager.get("splash_anim.atlas", TextureAtlas.class).findRegions("splash"));
+    }
+
+    public void show() {
+        Gdx.input.setCatchBackKey(true);
+        InputProcessor inputProcessor = new InputAdapter(){
+            @Override
+            public boolean keyUp(int keycode) {
+                if (keycode == Input.Keys.BACK){
+                    quitWindow.show(stage);
+                }
+                return true;
+            }
+        };
+
+        InputMultiplexer multiplexer = new InputMultiplexer(stage, inputProcessor);
+        Gdx.input.setInputProcessor(multiplexer);
 
         Array<Image> titleArray = new Array<>(8);
         titleArray.addAll(y_1, a, y_2, ex_mark, p_1, i, p_2, e);
@@ -206,135 +305,8 @@ public class MainMenuScreen extends GameScreen{
                 }))
                 .start(tweenManager);
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = assetLoader.mediumFont_anja;
-        style.fontColor = Color.BLACK;
-        style.pressedOffsetY = -10;
-
-        TextButton newGame = new TextButton("NEW GAME", style);
-        newGame.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
-                if (AssetLoader.prefs.getBoolean("firstRun", true)){
-                    dispose();
-                    game.setScreen(new GamePlayScreen(game, GridSize.TUTORIAL, Difficulty.TUTORIAL_BASIC));
-                } else {
-                    dispose();
-                    game.setScreen(new GameSettingScreen(game, assetLoader));
-                }
-            }
-        });
-
-        TextButton achievement = new TextButton("ACHIEVEMENT", style);
-        achievement.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
-                YayPipe.playService.showAchievement();
-            }
-        });
-
-        TextButton statistics = new TextButton("STATISTICS", style);
-        statistics.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
-                dispose();
-                game.setScreen(new StatisticsScreen(game, assetLoader));
-            }
-        });
-
-        // TODO: 11/09/2016 purchase test
-        TextButton test = new TextButton("TEST", style);
-        test.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                YayPipe.playService.removeAds();
-            }
-        });
-
-        int highScore = AssetLoader.prefs.getInteger("highScore");
-        Label.LabelStyle labelStyle = new Label.LabelStyle(assetLoader.smallFont_anja, Color.BLACK);
-        Label highScoreLabel = new Label("High Score\n" + String.valueOf(highScore), labelStyle);
-        highScoreLabel.setAlignment(Align.top);
-
-        Table table = new Table();
-        table.setFillParent(true);
-        table.add(yay).padTop(Gdx.graphics.getHeight() * 0.2f).expandX().height(yay.getHeight()).align(Align.center);
-        table.row();
-        table.add(pipe).padTop(pipe.getHeight()*0.15f).expandX().height(pipe.getHeight()).align(Align.center).expandY();
-        table.row();
-        table.add(newGame).padTop(Gdx.graphics.getHeight() * 0.1f);
-        table.row();
-        table.add(statistics);
-        table.row();
-        table.add(achievement);
-        table.row();
-        table.add(test).padBottom(Value.percentHeight(0.5f));
-        table.row();
-        table.add(highScoreLabel).height(Gdx.graphics.getHeight() * 0.2f);
-
-        stage.addActor(table);
-
-
-        table.validate();
-        pipePos = e.localToStageCoordinates(new Vector2());
-
-        drop = new Actor(){
-            @Override
-            public void draw(Batch batch, float parentAlpha) {
-                Color color = new Color(batch.getColor());
-                batch.setColor(drop.getColor());
-                batch.draw(assetLoader.waterDrop, drop.getX(), drop.getY(), e.getWidth() * 0.5f, e.getWidth() * 0.5f);
-                batch.setColor(color);
-            }
-        };
-
-        Tween.set(drop, SpriteAccessor.ALPHA).target(0f).start(tweenManager);
-        stage.addActor(drop);
-
-        Actor inPipeActor = new Actor(){
-            @Override
-            public void act(float delta) {
-                if (isAnimationStart) {
-                    pipeAnimationStateTime += delta;
-                }
-            }
-
-            @Override
-            public void draw(Batch batch, float parentAlpha) {
-                if (isAnimationStart) {
-                    batch.draw((TextureRegion) inPipe.getKeyFrame(pipeAnimationStateTime, false),
-                            pipePos.x + e.getWidth() * 0.1f, pipePos.y - e.getHeight() * 1.46f, e.getWidth() * 0.4f, e.getWidth() * 0.4f);
-                }
-            }
-        };
-
-        stage.addActor(inPipeActor);
-
-        Actor splashActor = new Actor(){
-            @Override
-            public void act(float delta) {
-                if (isAnimationStart && splashAnimationStart) {
-                    splashAnimationStateTime += delta;
-                }
-            }
-
-            @Override
-            public void draw(Batch batch, float parentAlpha) {
-                if (isAnimationStart && splashAnimationStart)
-                batch.draw(splash.getKeyFrame(splashAnimationStateTime, false),
-                        pipePos.x + e.getWidth() * 0.1f, 0, e.getWidth() * 0.5f, e.getWidth() * 0.5f);
-            }
-        };
-
-        stage.addActor(splashActor);
-
-        inPipe = new Animation(0.7f / 9f, assetLoader.uiSkin.getAtlas().findRegions("drop"));
-        splash = new Animation(0.05f, assetLoader.uiSkin.getAtlas().findRegions("splash"));
-
-
+        int highScore = GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL);
+        highScoreLabel.setText("High Score\n" + String.valueOf(highScore));
     }
 
     private boolean firstLoop = true;
@@ -342,29 +314,24 @@ public class MainMenuScreen extends GameScreen{
     @Override
     public void render(float delta) {
         super.render(delta);
-        tweenManager.update(delta);
 
         stage.act(delta);
         stage.draw();
-
-//        stage.getBatch().begin();
-//        stage.getBatch().draw(assetLoader.water_lb, 100 ,100);
-//        stage.getBatch().end();
 
         if(isAnimationStart) {
             if (firstLoop) {
                 Timeline.createSequence()
                         .pushPause(0.45f)
-                        .push(Tween.set(drop, SpriteAccessor.POSITION).target(pipePos.x + e.getWidth() * 0.03f, pipePos.y - e.getHeight() * 1.7f))
+                        .push(Tween.set(drop, SpriteAccessor.POSITION).target(dropStartPos.x, dropStartPos.y))
                         .push(Tween.to(drop, SpriteAccessor.ALPHA, 0.1f).target(1f))
-                        .push(Tween.to(drop, SpriteAccessor.POSITION, 1f).target(pipePos.x + e.getWidth() * 0.03f, 0).ease(Sine.IN))
+                        .push(Tween.to(drop, SpriteAccessor.POSITION, 1f).target(dropStartPos.x, 0).ease(Sine.IN))
                         .push(Tween.set(drop, SpriteAccessor.ALPHA).target(0f))
                         .repeat(Tween.INFINITY,0f).setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
                         splashAnimationStart = true;
                         isDropFinished = true;
-                        waterDropSound.play(AssetLoader.prefs.getFloat("soundVolume"));
+                        assetLoader.getSound(SoundType.WATER_DROP).play(GameData.getInstance().getSoundVolume());
                     }
                 }).setCallbackTriggers(TweenCallback.END)
                         .start(tweenManager);
@@ -383,6 +350,11 @@ public class MainMenuScreen extends GameScreen{
                 splashAnimationStateTime = 0;
             }
         }
+
+//        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+//        shapeRenderer.rectLine(0, dropStartPos.y, Gdx.graphics.getWidth(), dropStartPos.y, 5);
+//        shapeRenderer.rectLine(dropStartPos.x, 0, dropStartPos.x, Gdx.graphics.getHeight(), 5);
+//        shapeRenderer.end();
     }
 
     @Override
@@ -397,17 +369,17 @@ public class MainMenuScreen extends GameScreen{
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
-        tweenManager.killAll();
+        y_1.setScale(0f);
+        a.setScale(0f);
+        y_2.setScale(0f);
+        ex_mark.setScale(0f);
+        p_1.setScale(0f);
+        i.setScale(0f);
+        p_2.setScale(0f);
+        e.setScale(0f);
     }
 }

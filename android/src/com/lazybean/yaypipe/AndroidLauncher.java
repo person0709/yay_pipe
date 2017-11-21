@@ -12,6 +12,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.games.Games;
 import com.google.example.games.basegameutils.GameHelper;
+import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AdHelper;
 import com.lazybean.yaypipe.gamehelper.PlayService;
 import com.lazybean.yaypipe.util.IabHelper;
@@ -22,6 +23,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	private GameHelper gameHelper;
 	private final static int requestCode = 1;
 	private IabHelper mHelper;
+
 	// TODO: 11/09/2016 key encryption
 	private final String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsnRdD" +
 			"c4tchh/KSKUkzxuQo97xZ4jy42oAuVA/7hhMsG/gGT5m65qkDkxSx8cCMhJz/GQiZZVYjIy4qpRWtS/SIkvRCrC" +
@@ -62,9 +64,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 			@Override
 			public void onIabSetupFinished(IabResult result) {
 				if (!result.isSuccess()){
-					Gdx.app.log("IAB","setup_failed");
+//					Gdx.app.log("IAB","setup_failed");
 				}
-				Gdx.app.log("IAB","setup_succeeded");
+//				Gdx.app.log("IAB","setup_succeeded");
 			}
 		});
 
@@ -188,90 +190,90 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	}
 
 	@Override
-	public void unlockAchievement(int order) {
+	public void unlockAchievement(AchievementType achievementType) {
 		if (isSignedIn()) {
-			switch (order) {
-				case 0:
+			switch (achievementType) {
+				case WELCOME:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
-							getString(R.string.achievement_welcome_to_yaypipe));
+							getString(R.string.achievement_welcome));
 					break;
 
-				case 1:
+				case TOO_EASY:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
-							getString(R.string.achievement_the_first_step));
+							getString(R.string.achievement_too_easy));
 					break;
 
-				case 2:
+				case START_PLUMBING:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
-							getString(R.string.achievement_youre_getting_there));
+							getString(R.string.achievement_start_plumbing));
 					break;
 
-				case 3:
+				case NOT_HARD_ENOUGH:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
-							getString(R.string.achievement_wasnt_too_hard_eh));
+							getString(R.string.achievement_not_hard_enough));
 					break;
 
-				case 4:
+				case PIPING_HOT:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_piping_hot));
 					break;
 
-				case 5:
+				case MARIO_WILL_BE_PROUD:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_mario_will_be_proud));
 					break;
 
-				case 6:
+				case NOVICE_PLUMBER:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_novice_plumber));
 					break;
 
-				case 7:
+				case MEDIOCRE_PLUMBER:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_mediocre_plumber));
 					break;
 
-				case 8:
+				case PROFESSIONAL_PLUMBER:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_professional_plumber));
 					break;
 
-				case 9:
+				case EXPERT_PLUMBER:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_expert_plumber));
 					break;
 
-				case 10:
+				case MASTER_PLUMBER:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_master_plumber));
 					break;
 
-				case 11:
+				case COWARD:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_coward));
 					break;
 
-				case 12:
+				case THINGS_HAPPEN:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
-							getString(R.string.achievement_its_aul_good_man));
+							getString(R.string.achievement_things_happen));
 					break;
 
-				case 13:
+				case ON_FIRE:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
-							getString(R.string.achievement_youre_on_fire));
+							getString(R.string.achievement_on_fire));
 					break;
 
-				case 14:
+				case VERY_RESOURCEFUL:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_very_resourceful));
 					break;
 
-				case 15:
+				case CAREFUL_PLANNER:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_careful_planner));
 					break;
 
-				case 16:
+				case TOO_MUCH_FREE_TIME:
 					Games.Achievements.unlock(gameHelper.getApiClient(),
 							getString(R.string.achievement_too_much_free_time));
 					break;
@@ -280,19 +282,19 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	}
 
 	@Override
-	public void incrementAchievement(int order) {
+	public void incrementAchievement(AchievementType achievementType, int count) {
 		if (isSignedIn()) {
-			switch (order) {
-				case 0:
+			switch (achievementType) {
+				case SORE_FINGER:
 					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_sore_finger), 1);
 					break;
 
-				case 1:
+				case BE_WATER_MY_FRIEND:
 					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_be_water_my_friend), 1);
 					break;
 
-				case 2:
-					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_keep_it_up), 1);
+				case PLAY_TIME:
+					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_keep_calm_and_plumb_on), 1);
 					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_no_pain_no_flow), 1);
 					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_try_hard), 1);
 					break;

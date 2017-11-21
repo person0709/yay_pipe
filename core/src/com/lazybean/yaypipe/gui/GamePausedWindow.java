@@ -1,111 +1,68 @@
 package com.lazybean.yaypipe.gui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.lazybean.yaypipe.GameWorld;
+import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.Colour;
+import com.lazybean.yaypipe.gamehelper.CustomColor;
+import com.lazybean.yaypipe.gamehelper.FontType;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
+import com.lazybean.yaypipe.gamehelper.GameState;
+import com.lazybean.yaypipe.gamehelper.IconType;
 
-public class GamePausedWindow extends Group {
-    public Background background;
-    public Table window;
+public class GamePausedWindow extends GameWindow {
+    private final float ICON_DIAMETER = YayPipe.SCREEN_WIDTH * 0.15f;
 
-    private boolean isResume = false;
-    private boolean isSound = true;
-    private boolean isRestart = false;
-    private boolean isQuit = false;
+    public Icon resumeIcon, soundIcon, restartIcon, quitIcon;
 
-    public GamePausedWindow(final AssetLoader assetLoader){
-        background = new Background();
-        background.setColor(0, 0, 0, 0f);
-        addActor(background);
+    public GamePausedWindow(final AssetLoader assetLoader, GameWorld gameWorld){
+        super("", assetLoader.uiSkin, gameWorld);
 
-        if (AssetLoader.prefs.getFloat("soundVolume") == 0){
-            isSound = false;
-        }
+        setColor(getColor().r, getColor().g, getColor().b, 0f);
 
-        LabelStyle labelStyle = new LabelStyle(assetLoader.extraSmallFont_noto, Color.BLACK);
+        LabelStyle titleStyle = new LabelStyle(assetLoader.getFont(FontType.ANJA_MEDIUM), Color.BLACK);
+        Label title = new Label("PAUSED", titleStyle);
 
-        window = new Table();
-//        window.setDebug(true);
-        window.setTransform(true);
-        window.setWidth(Gdx.graphics.getWidth() * 0.65f);
-        window.setHeight(window.getWidth() * 0.7f);
-        window.setBackground(new NinePatchDrawable(assetLoader.window));
-        window.setPosition(Gdx.graphics.getWidth() / 2 - window.getWidth() /2,
-                Gdx.graphics.getHeight() /2 - window.getHeight() / 2);
-        window.setOrigin(window.getWidth()/2, window.getHeight()/2);
+        getContentTable().add(title);
 
-        LabelStyle style = new LabelStyle(assetLoader.mediumLargeFont_anja, Color.WHITE);
-
-        Label paused = new Label("PAUSE", style);
-        paused.setColor(Color.BLACK);
-        window.add(paused).padBottom(Value.percentHeight(0.5f)).colspan(3);
-        window.row();
+        LabelStyle labelStyle = new LabelStyle(assetLoader.getFont(FontType.NOTO_EXTRA_SMALL), Color.BLACK);
 
         Table quit = new Table();
-        Icon quit_icon = new Icon(assetLoader.circle, assetLoader.home);
-        quit_icon.setDiameter(window.getWidth() * 0.23f);
-        quit_icon.setColor(Colour.INDIGO);
-        quit_icon.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
-                isQuit = true;
-            }
-        });
+        quitIcon = new Icon(assetLoader, IconType.HOME, Icon.MENU_DIAMETER);
+        quitIcon.setColor(CustomColor.INDIGO.getColor());
 
         Label quit_label = new Label("MAIN", labelStyle);
 
-        quit.add(quit_icon).row();
+        quit.add(quitIcon).size(ICON_DIAMETER).row();
         quit.add(quit_label);
-        window.add(quit).expandY().width(Value.percentWidth(0.23f, window));
+        getButtonTable().add(quit).padLeft(Value.percentWidth(0.1f));
 
 
         Table restart = new Table();
-        Icon restart_icon = new Icon(assetLoader.circle, assetLoader.restart);
-        restart_icon.setDiameter(window.getWidth() * 0.23f);
-        restart_icon.setColor(Colour.INDIGO);
-        restart_icon.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
-                isRestart = true;
-            }
-        });
+        restartIcon = new Icon(assetLoader, IconType.RESTART, Icon.MENU_DIAMETER);
+        restartIcon.setColor(CustomColor.INDIGO.getColor());
 
         Label restart_label = new Label("RESTART", labelStyle);
 
-        restart.add(restart_icon).row();
+        restart.add(restartIcon).size(ICON_DIAMETER).row();
         restart.add(restart_label);
 
-        window.add(restart).expandX();
+        getButtonTable().add(restart).expandX();
 
         Table sound = new Table();
-        final Icon sound_icon = new Icon(assetLoader.circle, assetLoader.sound);
-        if (!isSound){
-            sound_icon.setIconImage(assetLoader.soundOff);
+        soundIcon = new Icon(assetLoader, IconType.SOUND, Icon.MENU_DIAMETER);
+        if (GameData.getInstance().isSoundOn()){
+            soundIcon.setIconImage(assetLoader.getIconTexture(IconType.SOUND));
         }
-        sound_icon.setDiameter(window.getWidth() * 0.23f);
-        sound_icon.setColor(Colour.INDIGO);
-        sound_icon.addListener(new InputListener() {
+        soundIcon.setColor(CustomColor.INDIGO.getColor());
+        soundIcon.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
@@ -113,82 +70,68 @@ public class GamePausedWindow extends Group {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
-                if (isSound){
-                    sound_icon.setIconImage(assetLoader.soundOff);
-                    isSound = false;
-                    AssetLoader.prefs.putFloat("soundVolume",0);
-                    AssetLoader.prefs.flush();
+                if (GameData.getInstance().isSoundOn()){
+                    soundIcon.setIconImage(assetLoader.getIconTexture(IconType.SOUND_OFF));
+                    GameData.getInstance().setSoundOn(false);
                 }
                 else{
-                    sound_icon.setIconImage(assetLoader.sound);
-                    isSound = true;
-                    AssetLoader.prefs.putFloat("soundVolume",1f);
-                    AssetLoader.prefs.flush();
+                    soundIcon.setIconImage(assetLoader.getIconTexture(IconType.SOUND));
+                    GameData.getInstance().setSoundOn(true);
                 }
             }
         });
 
         Label sound_label = new Label("SOUND", labelStyle);
 
-        sound.add(sound_icon).row();
+        sound.add(soundIcon).size(ICON_DIAMETER).row();
         sound.add(sound_label);
 
-        window.add(sound);
+        getButtonTable().add(sound).padRight(Value.percentWidth(0.1f));
 
+        pack();
 
-        Icon resume = new Icon(assetLoader.circle, assetLoader.cross);
-        resume.setDiameter(window.getWidth() * 0.15f);
-        resume.setColor(Colour.RED);
-        resume.setPosition(window.getWidth() - resume.getWidth() * 1.2f,
-                window.getHeight() - resume.getHeight() * 1.2f);
-        resume.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
+        //prevents resumeIcon from clipping
+        setClip(false);
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
-                isResume = true;
-            }
-        });
+        resumeIcon = new Icon(assetLoader, IconType.CROSS, Icon.MENU_DIAMETER);
+        resumeIcon.setDiameter(YayPipe.SCREEN_WIDTH * 0.1f);
+        resumeIcon.setColor(CustomColor.RED.getColor());
+        resumeIcon.setPosition(getWidth() - resumeIcon.getWidth() * 1.2f,
+                getHeight() - resumeIcon.getHeight() * 1.2f);
 
-        window.addActor(resume);
+        addActor(resumeIcon);
 
-        addActor(window);
+//        debugAll();
     }
 
-    public boolean isResume() {
-        return isResume;
+    @Override
+    public float getPrefWidth() {
+        return YayPipe.SCREEN_WIDTH * 0.65f;
     }
 
-    public void setResume(boolean bool) {
-        isResume = bool;
+    @Override
+    public float getPrefHeight() {
+        return getPrefWidth() * 0.7f;
     }
 
-    public boolean getSound(){
-        return isSound;
-    }
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (quitIcon.isTouched()){
+            quitIcon.setTouched(false);
+            gameWorld.setState(GameState.QUIT);
+            hide();
+        }
 
-    public void setSound(boolean bool){
-        isSound = bool;
-    }
-
-    public boolean isRestart(){
-        return isRestart;
-    }
-
-    public void setRestart(boolean bool){
-        isRestart = bool;
-    }
-
-    public boolean isQuit(){
-        return isQuit;
-    }
-
-    public void setQuit(boolean bool){
-        isQuit = bool;
+        else if (restartIcon.isTouched()){
+            restartIcon.setTouched(false);
+            gameWorld.setState(GameState.RESTART);
+            hide();
+        }
+        else if (resumeIcon.isTouched()){
+            resumeIcon.setTouched(false);
+            gameWorld.resume();
+            hide();
+        }
     }
 }

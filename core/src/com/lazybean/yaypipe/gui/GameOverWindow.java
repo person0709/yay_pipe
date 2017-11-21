@@ -2,27 +2,30 @@ package com.lazybean.yaypipe.gui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
-import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.Colour;
-import com.lazybean.yaypipe.gamehelper.Difficulty;
 import com.lazybean.yaypipe.GameWorld;
+import com.lazybean.yaypipe.YayPipe;
+import com.lazybean.yaypipe.gamehelper.AssetLoader;
+import com.lazybean.yaypipe.gamehelper.GameState;
+import com.lazybean.yaypipe.gamehelper.gamedata.CoinBank;
+import com.lazybean.yaypipe.gamehelper.CustomColor;
+import com.lazybean.yaypipe.gamehelper.FontType;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
+import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
+import com.lazybean.yaypipe.gamehelper.gamedata.Statistics;
+import com.lazybean.yaypipe.gamehelper.StatisticsType;
 import com.lazybean.yaypipe.gameobjects.Coin;
-import com.lazybean.yaypipe.gameobjects.Score;
+import com.lazybean.yaypipe.gamehelper.Score;
 
 import java.text.DecimalFormat;
 
@@ -34,18 +37,15 @@ import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Quart;
 import aurelienribon.tweenengine.equations.Sine;
 
-public class GameOverWindow extends Group {
-    public Background fadeInOut;
-    public Table window;
+public class GameOverWindow extends GameWindow{
     private Container<Label> container;
     private Label finalScore_label, finalScore_value;
     private Label coin_value;
 
+    private Icon retry_icon, quit_icon, view_icon;
+
     private Score score;
-    private boolean isClear;
-    private boolean isRestart = false;
-    private boolean isQuit = false;
-    private boolean isView = false;
+    private CoinBank coinBank;
 
     private boolean scoreUpdateStart = false;
 
@@ -53,62 +53,50 @@ public class GameOverWindow extends Group {
 
     private TweenManager tweenManager;
 
-    public GameOverWindow(AssetLoader assetLoader, boolean isClear, TweenManager tweenManager) {
-        score = GameWorld.score;
-        this.isClear = isClear;
-        this.tweenManager = tweenManager;
+    public GameOverWindow(AssetLoader assetLoader, final boolean isClear, GameWorld gameWorld) {
+        super("", assetLoader.uiSkin, gameWorld);
 
-        window = new Table();
-//        window.setDebug(true);
-        window.setTransform(true);
-        window.setWidth(Gdx.graphics.getWidth() * 0.85f);
-        window.setHeight(window.getWidth() * 1.7f);
-        window.setPosition(Gdx.graphics.getWidth() / 2 - window.getWidth() / 2,
-                Gdx.graphics.getHeight() / 2 - window.getHeight() / 2);
-        window.setOrigin(window.getWidth()/2, window.getHeight()/2);
-        window.setBackground(new NinePatchDrawable(assetLoader.window));
+        this.score = gameWorld.getScore();
+        this.coinBank = GameData.getInstance().coinBank;
 
-        String string;
-        Color stringColor = new Color(Color.BLACK);
-        Color iconColor = new Color(Colour.INDIGO);
+        this.tweenManager = new TweenManager();
+
+        Color iconColor = CustomColor.INDIGO.getColor();
+        Label.LabelStyle style = new Label.LabelStyle(assetLoader.getFont(FontType.ANJA_EXTRA_LARGE), Color.BLACK);
         if (isClear){
-            string = "YAY!\nCLEAR!";
+            Label label = new Label("YAY!\nCLEAR!", style);
+            label.setAlignment(Align.center);
+            getContentTable().add(label).padBottom(Value.percentHeight(0.2f)).colspan(2).row();
         }
         else{
-            string = "GAME\nOVER";
+            Label label = new Label("GAME\nOVER", style);
+            label.setAlignment(Align.center);
+            getContentTable().add(label).padBottom(Value.percentHeight(0.2f)).colspan(2).row();
         }
 
-        LabelStyle gameOverStyle = new LabelStyle(assetLoader.extraLargeFont_anja, stringColor);
-        LabelStyle timeStyle = new LabelStyle(assetLoader.mediumFont_noto, stringColor);
-        LabelStyle detailStyle = new LabelStyle(assetLoader.doubleExtraSmallFont_noto, stringColor);
-        LabelStyle finalScoreStyle = new LabelStyle(assetLoader.mediumFontShadow_anja,Color.WHITE);
-
-        Label gameOver_label = new Label(string, gameOverStyle);
-        gameOver_label.setAlignment(Align.center, Align.center);
-
-        Label clearTime = new Label(AssetLoader.stats.convertSecondToMinute(AssetLoader.stats.getStageTimeSum()), timeStyle);
+        Label clearTime = new Label(GameData.getInstance().statistics.convertSecondToMinute(GameData.getInstance().statistics.getStageTimeSum()), getSkin(), "gameOverTime");
 
         // TODO: 24/08/2016 time bonus
 //        Label timeBonus_label = new Label("TIME BONUS", detailStyle);
 //        Label timeBonus_value = new Label("1000", detailStyle);
 
-        Label pipeConnected_label = new Label("PIPE CONNECTED", detailStyle);
-        Label pipeConnected_value = new Label(String.valueOf(score.getPipeConnectScore()), detailStyle);
+        Label pipeConnected_label = new Label("PIPE CONNECTED", getSkin(), "gameOverText");
+        Label pipeConnected_value = new Label(String.valueOf(score.getPipeConnectScore()), getSkin(), "gameOverText");
 
-        Label stopCleared_label = new Label("STOPS CLEARED", detailStyle);
-        Label stopCleared_value = new Label(String.valueOf(score.getStopPassScore()), detailStyle);
+        Label stopCleared_label = new Label("STOPS CLEARED", getSkin(), "gameOverText");
+        Label stopCleared_value = new Label(String.valueOf(score.getStopPassScore()), getSkin(), "gameOverText");
 
-        Label pipeChange_label = new Label("PIPE CHANGE PENALTY", detailStyle);
-        Label pipeChange_value = new Label(String.valueOf(score.getPipeChangeScore()), detailStyle);
+        Label pipeChange_label = new Label("PIPE CHANGE PENALTY", getSkin(), "gameOverText");
+        Label pipeChange_value = new Label(String.valueOf(score.getPipeChangeScore()), getSkin(), "gameOverText");
 
-        Label crossPipeUse_label = new Label("CROSS PIPE BONUS", detailStyle);
-        Label crossPipeUse_value = new Label('x' + String.valueOf(new DecimalFormat("#.#").format(1.0f + 0.1f * AssetLoader.stats.getCrossPipeUse())), detailStyle);
+        Label crossPipeUse_label = new Label("CROSS PIPE BONUS", getSkin(), "gameOverText");
+        Label crossPipeUse_value = new Label('x' + String.valueOf(new DecimalFormat("#.#").format(1.0f + 0.1f * GameData.getInstance().statistics.getFullPipeCount())), getSkin(), "gameOverText");
 
         Image line = new Image(assetLoader.line);
         line.setScaling(Scaling.fillX);
         line.setColor(Color.BLACK);
 
-        finalScore_label = new Label("SCORE", finalScoreStyle);
+        finalScore_label = new Label("SCORE", getSkin(), "gameOverFinalScore");
         finalScore_label.setColor(Color.BLACK);
         finalScore_label.setAlignment(Align.center);
 
@@ -116,7 +104,7 @@ public class GameOverWindow extends Group {
         container.setTransform(true);
         container.setOrigin(finalScore_label.getWidth()/2, finalScore_label.getHeight());
 
-        finalScore_value = new Label("0", finalScoreStyle);
+        finalScore_value = new Label("0", getSkin(), "gameOverFinalScore");
         finalScore_value.setColor(Color.BLACK);
 
         Image piggy = new Image(assetLoader.piggy);
@@ -125,141 +113,96 @@ public class GameOverWindow extends Group {
         Image coin = new Image(assetLoader.coin);
         coin.setScaling(Scaling.fillX);
 
-        coin_value = new Label("0", finalScoreStyle);
+        coin_value = new Label("0", getSkin(), "gameOverFinalScore");
         coin_value.setColor(Color.BLACK);
 
-
-        Icon retry_icon = new Icon(assetLoader.circle, assetLoader.restart);
+        retry_icon = new Icon(assetLoader, IconType.RESTART, Icon.MENU_DIAMETER);
         retry_icon.setColor(iconColor);
-        retry_icon.setDiameter(window.getWidth() * 0.15f);
-        retry_icon.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                isRestart = true;
-            }
-        });
-        
-        Label retry_label = new Label("RESTART", detailStyle);
+        Label retry_label = new Label("RESTART", getSkin(), "gameOverText");
 
 
-        Icon quit_icon = new Icon(assetLoader.circle, assetLoader.home);
+        quit_icon = new Icon(assetLoader, IconType.HOME, Icon.MENU_DIAMETER);
         quit_icon.setColor(iconColor);
-        quit_icon.setDiameter(window.getWidth() * 0.15f);
-        quit_icon.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                isQuit = true;
-            }
-        });
-        
-        Label quit_label = new Label("HOME", detailStyle);
+        Label quit_label = new Label("HOME", getSkin(), "gameOverText");
 
 
-        Icon view_icon = new Icon(assetLoader.circle, assetLoader.zoomIn);
+        view_icon = new Icon(assetLoader, IconType.ZOOM_IN, Icon.MENU_DIAMETER);
         view_icon.setColor(iconColor);
-        view_icon.setDiameter(window.getWidth() * 0.15f);
-        view_icon.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                isView = true;
-            }
-        });
-
-        Label view_label = new Label("VIEW", detailStyle);
+        Label view_label = new Label("VIEW", getSkin(), "gameOverText");
 
 
-        window.add(gameOver_label).colspan(2).expandX();
-        window.row();
-
-        window.add(clearTime).colspan(2).height(gameOver_label.getHeight()/3).padBottom(clearTime.getHeight()/2);
-        window.row();
+        Table contentTable = getContentTable();
+        contentTable.add(clearTime).colspan(2).padBottom(Value.percentHeight(0.5f));
+        contentTable.row();
 
 //        window.add(timeBonus_label).align(Align.left).padLeft(Value.percentWidth(0.2f, window));
 //        window.add(timeBonus_value).align(Align.right).padRight(Value.percentWidth(0.2f, window));
 //        window.row();
 
-        window.add(pipeConnected_label).align(Align.left).padLeft(Value.percentWidth(0.2f, window));
-        window.add(pipeConnected_value).align(Align.right).padRight(Value.percentWidth(0.2f, window));
-        window.row();
+        contentTable.add(pipeConnected_label).align(Align.left).padLeft(Value.percentWidth(0.2f, this));
+        contentTable.add(pipeConnected_value).align(Align.right).padRight(Value.percentWidth(0.2f, this));
+        contentTable.row();
 
-        window.add(stopCleared_label).align(Align.left).padLeft(Value.percentWidth(0.2f, window));
-        window.add(stopCleared_value).align(Align.right).padRight(Value.percentWidth(0.2f, window));
-        window.row();
+        contentTable.add(stopCleared_label).align(Align.left).padLeft(Value.percentWidth(0.2f, this));
+        contentTable.add(stopCleared_value).align(Align.right).padRight(Value.percentWidth(0.2f, this));
+        contentTable.row();
 
-        window.add(pipeChange_label).align(Align.left).padLeft(Value.percentWidth(0.2f, window));
-        window.add(pipeChange_value).align(Align.right).padRight(Value.percentWidth(0.2f, window));
-        window.row();
+        contentTable.add(pipeChange_label).align(Align.left).padLeft(Value.percentWidth(0.2f, this));
+        contentTable.add(pipeChange_value).align(Align.right).padRight(Value.percentWidth(0.2f, this));
+        contentTable.row();
 
 
         // cross pipe bonus only given when cleared
         if (isClear) {
-            window.add(crossPipeUse_label).align(Align.left).padLeft(Value.percentWidth(0.2f, window));
-            window.add(crossPipeUse_value).align(Align.right).padRight(Value.percentWidth(0.2f, window));
-            window.row();
+            contentTable.add(crossPipeUse_label).align(Align.left).padLeft(Value.percentWidth(0.2f, this));
+            contentTable.add(crossPipeUse_value).align(Align.right).padRight(Value.percentWidth(0.2f, this));
+            contentTable.row();
         }
 
-        window.add(line).height(stopCleared_label.getHeight()).padLeft(Value.percentWidth(0.1f, window))
-                .padRight(Value.percentWidth(0.1f, window)).colspan(2);
-        window.row();
+        contentTable.add(line).height(stopCleared_label.getHeight()).padLeft(Value.percentWidth(0.1f, this))
+                .padRight(Value.percentWidth(0.1f, this)).colspan(2);
+        contentTable.row();
 
-        window.add(container).height(finalScore_label.getHeight() * 2).align(Align.left).padLeft(Value.percentWidth(0.2f, window));
-        window.add(finalScore_value).align(Align.right).padRight(Value.percentWidth(0.2f, window));
-        window.row();
+        GlyphLayout scoreLayout = new GlyphLayout(finalScore_value.getStyle().font, String.valueOf(score.getTotalScore()));
+        contentTable.add(container).height(finalScore_label.getHeight() * 2.1f).align(Align.left).padLeft(Value.percentWidth(0.2f, this));
+        contentTable.add(finalScore_value).width(scoreLayout.width).align(Align.right).padRight(Value.percentWidth(0.2f, this));
+        contentTable.row();
 
-        window.add(piggy).height(Value.percentWidth(0.3f, window)).colspan(2).padTop(finalScore_value.getHeight() / 2);
-        window.row();
+        contentTable.add(piggy).height(Value.percentWidth(0.3f, this)).colspan(2).padTop(Value.percentHeight(0.2f));
+        contentTable.row();
 
         Table coinGroup = new Table();
         coinGroup.add(coin).width(coin_value.getHeight());
         coinGroup.add(coin_value);
-        window.add(coinGroup).colspan(2);
-        window.row();
+        contentTable.add(coinGroup).colspan(2);
+        contentTable.row();
         
-        Table iconGroup = new Table();
+        Table iconTable = getButtonTable();
 
         Table quit = new Table();
-        quit.add(quit_icon).row();
+        quit.add(quit_icon).size(Value.percentWidth(0.17f, this)).row();
         quit.add(quit_label);
 
-        iconGroup.add(quit).width(Value.percentWidth(0.15f, window)).padLeft(Value.percentWidth(0.2f, window))
-                .padRight(Value.percentWidth(0.1f, window));
+        iconTable.add(quit).padLeft(Value.percentWidth(0.2f, this))
+                .padRight(Value.percentWidth(0.1f, this));
 
+        Table retry = new Table();
+        retry.add(retry_icon).size(Value.percentWidth(0.17f, this)).row();
+        retry.add(retry_label);
 
-        if ( > Difficulty.TUTORIAL_BASIC) {
-            Table retry = new Table();
-            retry.add(retry_icon).row();
-            retry.add(retry_label);
-
-            iconGroup.add(retry);
-        }
-
+        iconTable.add(retry);
 
         Table view = new Table();
-        view.add(view_icon).row();
+        view.add(view_icon).size(Value.percentWidth(0.17f, this)).row();
         view.add(view_label);
 
-        iconGroup.add(view).width(Value.percentWidth(0.15f, window)).padLeft(Value.percentWidth(0.1f, window))
-                .padRight(Value.percentWidth(0.2f, window));
+        iconTable.add(view).padLeft(Value.percentWidth(0.1f, this))
+                .padRight(Value.percentWidth(0.2f, this));
 
-        window.add(iconGroup).padTop(coin_value.getHeight()/2).colspan(2);
-
-        addActor(window);
-
+        iconTable.padTop(coin_value.getHeight()/2);
 
         Timeline.createSequence()
                 .beginParallel()
@@ -276,18 +219,17 @@ public class GameOverWindow extends Group {
                 .push(Tween.set(finalScore_value, SpriteAccessor.ALPHA).target(0f))
                 .end()
                 .beginSequence()
-                .push(Tween.to(pipeConnected_label, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(pipeConnected_value, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(stopCleared_label, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(stopCleared_value, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(pipeChange_label, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(pipeChange_value, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(crossPipeUse_label, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(crossPipeUse_value, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(line, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(finalScore_label, SpriteAccessor.ALPHA, 0.5f).target(1f))
-                .push(Tween.to(finalScore_value, SpriteAccessor.ALPHA, 0.5f).target(1f))
-//                .push(Tween.to(piggy, SpriteAccessor.SCALE, 1f).target(0.5f))
+                .push(Tween.to(pipeConnected_label, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(pipeConnected_value, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(stopCleared_label, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(stopCleared_value, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(pipeChange_label, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(pipeChange_value, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(crossPipeUse_label, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(crossPipeUse_value, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(line, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(finalScore_label, SpriteAccessor.ALPHA, 0.3f).target(1f))
+                .push(Tween.to(finalScore_value, SpriteAccessor.ALPHA, 0.3f).target(1f))
                 .setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
@@ -297,7 +239,7 @@ public class GameOverWindow extends Group {
                 .end()
                 .start(tweenManager);
 
-        window.validate();
+        validate();
         //generate coins for piggy bank animation
         Vector2 score_stageLoc = finalScore_value.localToStageCoordinates(new Vector2());
 
@@ -317,7 +259,7 @@ public class GameOverWindow extends Group {
         for (int i = 0; i < coinArray.size; i++){
             Coin temp = coinArray.get(i);
             Timeline.createParallel()
-                    .delay(5f)
+                    .delay(3f)
                     .push(Tween.to(temp, SpriteAccessor.ALPHA, 0.2f).target(1f))
                     .push(Tween.to(temp, SpriteAccessor.POSITION, 1f)
                             .target(piggy_stageLoc.x + piggy.getWidth() / 2 - temp.getWidth()/2, piggy_stageLoc.y + piggy.getHeight() * 0.6f)
@@ -330,14 +272,13 @@ public class GameOverWindow extends Group {
                         @Override
                         public void onEvent(int type, BaseTween<?> source) {
                             //1% of total score when cleared
-                            if (isClear()) {
-                                AssetLoader.coinBank.addBalance((int) ((score.getTotalScore() * 0.01f) / coinArray.size));
+                            if (isClear) {
+                                coinBank.addBalance((int) ((score.getTotalScore() * 0.01f) / coinArray.size));
                             }
                             //0.5% of total score when failed
                             else{
-                                AssetLoader.coinBank.addBalance((int) ((score.getTotalScore() * 0.005f) / coinArray.size));
+                                coinBank.addBalance((int) ((score.getTotalScore() * 0.005f) / coinArray.size));
                             }
-                            AssetLoader.coinBank.saveData();
                         }
                     })
                     .delay(timeDelay)
@@ -346,50 +287,16 @@ public class GameOverWindow extends Group {
             timeDelay+= 0.2f;
         }
 
-    }
-
-    public boolean isClear(){
-        return isClear;
-    }
-
-    public boolean isRestart() {
-        return isRestart;
-    }
-
-    public void setRestart(boolean bool) {
-        isRestart = bool;
-    }
-
-    public boolean isQuit() {
-        return isQuit;
-    }
-
-    public void setQuit(boolean bool) {
-        isQuit = bool;
-    }
-
-    public boolean isView() {
-        return isView;
-    }
-
-    public void setView(boolean bool) {
-        isView = bool;
-    }
-
-    private boolean firstLoop = true;
-    @Override
-    public void act(float delta) {
-        int currentScore = score.getCurrentScore();
-        if (currentScore > score.getHighScore() && firstLoop && isClear()){
+        if (score.getCurrentScore() > GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)){
             Timeline.createSequence()
                     .push(Tween.to(container, SpriteAccessor.SCALE, 0.5f).target(0f).ease(Quart.IN)
-                    .setCallback(new TweenCallback() {
-                        @Override
-                        public void onEvent(int type, BaseTween<?> source) {
-                            finalScore_label.setText("HIGH\nSCORE");
-                            finalScore_label.setColor(Colour.RED);
-                        }
-                    }))
+                            .setCallback(new TweenCallback() {
+                                @Override
+                                public void onEvent(int type, BaseTween<?> source) {
+                                    finalScore_label.setText("HIGH\nSCORE");
+                                    finalScore_label.setColor(CustomColor.RED.getColor());
+                                }
+                            }))
                     .push(Tween.to(container, SpriteAccessor.SCALE, 0.5f).target(1.1f).ease(Quart.OUT))
                     .setCallback(new TweenCallback() {
                         @Override
@@ -400,20 +307,64 @@ public class GameOverWindow extends Group {
                         }
                     })
                     .start(tweenManager);
-
-            firstLoop = false;
         }
+    }
+
+    @Override
+    public float getWidth() {
+        return getPrefWidth();
+    }
+
+    @Override
+    public float getHeight() {
+        return getPrefHeight();
+    }
+
+    @Override
+    public float getPrefWidth() {
+        return YayPipe.SCREEN_WIDTH * 0.85f;
+    }
+
+    @Override
+    public float getPrefHeight() {
+        return YayPipe.SCREEN_HEIGHT * 0.75f;
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+        if (quit_icon.isTouched()){
+            quit_icon.setTouched(false);
+            gameWorld.setState(GameState.QUIT);
+        } else if (retry_icon.isTouched()){
+            retry_icon.setTouched(false);
+            gameWorld.setState(GameState.RESTART);
+        } else if (view_icon.isTouched()){
+            view_icon.setTouched(false);
+            gameWorld.setState(GameState.VIEW);
+            hide();
+        }
+
+        int currentScore = score.getCurrentScore();
+
         finalScore_value.setText(String.valueOf(currentScore));
         finalScore_value.setAlignment(Align.center);
 
-        int coin = AssetLoader.coinBank.getCurrentBalance();
+        int coin = coinBank.getCurrentBalance();
         coin_value.setText(String.valueOf(coin));
         coin_value.setAlignment(Align.center);
+
+        //skip score increasing animation
+        if (Gdx.input.justTouched()) {
+            tweenManager.update(100f);
+            score.skip();
+        }
 
         if (scoreUpdateStart) {
             score.update(5, true);
         }
         tweenManager.update(delta);
-        AssetLoader.coinBank.update(1);
+        coinBank.update(1);
     }
 }

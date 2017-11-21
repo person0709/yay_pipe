@@ -2,23 +2,18 @@ package com.lazybean.yaypipe.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.Difficulty;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
+import com.lazybean.yaypipe.gamehelper.GameState;
 import com.lazybean.yaypipe.gamehelper.GridSize;
 import com.lazybean.yaypipe.GameWorld;
-import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.YayPipe;
+import com.lazybean.yaypipe.gamehelper.StatisticsType;
 import com.lazybean.yaypipe.gui.Gui;
-
-import aurelienribon.tweenengine.BaseTween;
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenCallback;
-import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Quart;
 
 public class GamePlayScreen extends GameScreen {
     private AssetLoader assetLoader;
@@ -29,30 +24,30 @@ public class GamePlayScreen extends GameScreen {
     private Stage gameWorldStage;
     private Stage guiStage;
 
-    private TweenManager tweenManager;
-
-
-    public GamePlayScreen(YayPipe game, GridSize gridSize, Difficulty difficulty) {
-        super(game);
+    public GamePlayScreen(YayPipe game, Difficulty gridSize, GridSize difficulty) {
+        super(game, YayPipe.BACKGROUND_COLOUR);
         assetLoader = game.assetLoader;
-        tweenManager = new TweenManager();
 
         //loading ads
-        if (game.replayCount >= 3){
+        if (YayPipe.replayCount >= 3){
             YayPipe.adHelper.showAd();
-            game.replayCount = 0;
+            YayPipe.replayCount = 0;
         }
         else {
-            game.replayCount++;
+            YayPipe.replayCount++;
         }
 
-        gameWorldStage = new Stage(new ScreenViewport());
-        guiStage = new Stage(new ScreenViewport(), game.batch);
+        gameWorldStage = stage;
+
+        guiStage = new Stage(new ScreenViewport(), gameWorldStage.getBatch());
 
         InputMultiplexer im = new InputMultiplexer(guiStage, gameWorldStage);
         Gdx.input.setInputProcessor(im);
 
-        gameWorld = new GameWorld(gameWorldStage, assetLoader, gridSize, difficulty);
+        gameWorld = new GameWorld(gameWorldStage, assetLoader, difficulty, gridSize);
+        gui = new Gui(guiStage, gameWorld, assetLoader);
+        
+        gameWorld.attachGui(gui);
 
     }
 
@@ -66,35 +61,34 @@ public class GamePlayScreen extends GameScreen {
     @Override
     public void render(float delta) {
 //        Gdx.app.log("FPS", String.valueOf(Gdx.graphics.getFramesPerSecond()));
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        tweenManager.update(delta);
+        super.render(delta);
         gameWorld.update(delta);
+        gui.update(delta);
 
-        gameWorldStage.act();
         gameWorldStage.draw();
+        guiStage.draw();
 
-        gameUI.act();
-        gameUI.draw();
+        if (gameWorld.getState() == GameState.RESTART || gameWorld.getState() == GameState.QUIT) {
+            // consecutive count reset;
+            YayPipe.consecutiveClearCount = 0;
 
-        if (gameWorld.isRestart() || gameWorld.isQuit()) {
-            gameUI.addActor(fadeInOut);
-            Tween.to(fadeInOut, SpriteAccessor.ALPHA, 0.5f).target(1f).ease(Quart.OUT)
-                    .setCallback(new TweenCallback() {
-                        @Override
-                        public void onEvent(int type, BaseTween<?> source) {
-                            if (gameWorld.isRestart()) {
-                                AssetLoader.stats.incrementValue("totalRestartPerformed");
-                                dispose();
-                                game.setScreen(new GamePlayScreen(game, assetLoader));
-                            }
-                            else {
-                                dispose();
-                                game.setScreen(new MainMenuScreen(game, assetLoader));
-                            }
-                        }
-                    }).start(tweenManager);
+            //coward! achievement
+            YayPipe.consecutiveRestartCount++;
+            if (YayPipe.consecutiveRestartCount == 5){
+                YayPipe.playService.unlockAchievement(AchievementType.COWARD);
+            }
+
+            if (gameWorld.isRestart()) {
+                GameData.getInstance().statistics.incrementValue(StatisticsType.TOTAL_RESTART, 1);
+                game.setScreen(new GamePlayScreen(game, gameWorld.difficulty, gameWorld.gridSize));
+                dispose();
+            }
+            else {
+                game.setScreen(game.screenManager.getMainMenuScreen());
+                dispose();
+            }
+
+            gameWorld.setState(GameState.IDLE);
         }
     }
 
@@ -119,11 +113,12 @@ public class GamePlayScreen extends GameScreen {
 
     @Override
     public void dispose() {
+        super.dispose();
         Gdx.app.log("GamePlayScreen","disposed");
         gameWorld.dispose();
-        if (AssetLoader.stats.isTimerOn()){
-            AssetLoader.stats.stopTimer();
+        gui.dispose();
+        if (GameData.getInstance().statistics.isTimerOn()){
+            GameData.getInstance().statistics.stopTimer();
         }
-        AssetLoader.stats.saveData();
     }
 }

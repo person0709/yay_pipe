@@ -4,12 +4,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
+import com.lazybean.yaypipe.gamehelper.CustomColor;
+import com.lazybean.yaypipe.gamehelper.FontType;
+import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
-import com.lazybean.yaypipe.gui.Icon;
 
 import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
@@ -17,38 +20,32 @@ import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Back;
 
 public class BadgeIndicator extends Table {
-    private Array<Icon> badgeArray;
+    private Array<Badge> badgeArray;
     private Array<Image> arrowArray;
     private int count = 0;
 
-    private AssetLoader assetLoader;
     private TweenManager tweenManager = new TweenManager();
 
-    public BadgeIndicator(AssetLoader assetLoader, Array<Icon> badges){
-        if (badges.size == 0){
+    public BadgeIndicator(AssetLoader assetLoader, int badgeNum){
+        if (badgeNum == 0){
             return;
         }
 
-        this.assetLoader = assetLoader;
+        badgeArray = new Array<>(badgeNum);
+        arrowArray = new Array<>(badgeNum);
 
-        badgeArray = new Array<>(badges.size);
-        arrowArray = new Array<>(badges.size);
-
-        for (int i = 0; i < badges.size; i++){
-            Image arrow = new Image(assetLoader.badgeArrow);
+        for (int i = 0; i < badgeNum; i++){
+            Image arrow = new Image(assetLoader.getIconTexture(IconType.BADGE_ARROW));
             arrow.setScaling(Scaling.fit);
             arrow.setColor(Color.BLACK);
             arrowArray.add(arrow);
 
-            badgeArray.add(new Icon(badges.get(i)));
+            badgeArray.add(new Badge(assetLoader, String.valueOf(i+1)));
             badgeArray.get(i).setColor(Color.GRAY);
 
             add(arrow);
             add(badgeArray.get(i));
         }
-
-        Tween.registerAccessor(Group.class, new SpriteAccessor());
-        Tween.registerAccessor(Actor.class, new SpriteAccessor());
 
         Timeline.createSequence()
                 .push(Tween.to(arrowArray.get(0), SpriteAccessor.ALPHA, 0.1f).target(0f))
@@ -65,7 +62,7 @@ public class BadgeIndicator extends Table {
         tweenManager.killAll();
         arrowArray.get(count).setColor(Color.WHITE);
 
-        Color color = assetLoader.badgeColor.get(count);
+        CustomColor color = Badge.BADGE_COLORS.get(count);
         Timeline.createSequence()
                 .push(Tween.to(badgeArray.get(count), SpriteAccessor.SCALE, 0.2f).target(0f).ease(Back.IN))
                 .push(Tween.set(badgeArray.get(count), SpriteAccessor.COLOUR).target(color.r, color.g, color.b))

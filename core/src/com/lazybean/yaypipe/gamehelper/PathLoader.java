@@ -4,20 +4,20 @@ import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.lazybean.yaypipe.gameobjects.Block;
+import com.lazybean.yaypipe.gameobjects.GridBlock;
 
 public class PathLoader {
     //path coordinates for fromLeftToRight
-    private static Array<Vector2> straightPathPos = new Array<Vector2>();
+    private static Array<Vector2> straightPathPos = new Array<>();
 
     //average value of derivative lengths
     public static float straightPathDerAvg;
 
     //path coordinates for fromLeftToTop
-    private static Array<Vector2> curvePathPos = new Array<Vector2>();
+    private static Array<Vector2> curvePathPos = new Array<>();
 
     //average value of derivative lengths
-    public static float curvePathDerAvg;
+    private static float curvePathDerAvg;
 
     public static Array<Vector2> startFromTop, startFromBottom, startFromLeft, startFromRight;
     public static Array<Vector2> fromLeftToRight, fromRightToLeft, fromBottomToTop, fromTopToBottom;
@@ -25,14 +25,14 @@ public class PathLoader {
     public static Array<Vector2> fromLeftToBottom, fromBottomToLeft, fromRightToBottom, fromBottomToRight;
 
     public static void load() {
-        float blockLength = Block.LENGTH;
-        float blockGap = Block.GAP;
+        float blockLength = GridBlock.BLOCK_LENGTH;
+        float blockGap = GridBlock.BLOCK_GAP;
         float offset = blockLength * (25f / 115f);
 
         Vector2 pos1 = new Vector2(0, blockLength / 2);
         Vector2 pos2 = new Vector2(blockLength + blockGap + 2, pos1.y);
 
-        Bezier<Vector2> straightPath = new Bezier<Vector2>(pos1, pos2);
+        Bezier<Vector2> straightPath = new Bezier<>(pos1, pos2);
 
         float sum = 0;
         int sampleNumStraight = (int) straightPath.approxLength(50);
@@ -50,17 +50,17 @@ public class PathLoader {
 
         pos1 = new Vector2(0, blockLength / 2);
         pos2 = new Vector2(offset, pos1.y);
-        Array<Bezier<Vector2>> curvePath = new Array<Bezier<Vector2>>(3);
-        curvePath.add(new Bezier<Vector2>(pos1, pos2));
+        Array<Bezier<Vector2>> curvePath = new Array<>(3);
+        curvePath.add(new Bezier<>(pos1, pos2));
 
         Vector2 pos3 = new Vector2(pos2);
         Vector2 pos4 = new Vector2(pos3.x + blockLength / 2 - offset, pos3.y);
         Vector2 pos5 = new Vector2(pos3.x + blockLength / 2 - offset, pos3.y + blockLength / 2 - offset);
-        curvePath.add(new Bezier<Vector2>(pos3, pos4, pos5));
+        curvePath.add(new Bezier<>(pos3, pos4, pos5));
 
         Vector2 pos6 = new Vector2(pos5);
         Vector2 pos7 = new Vector2(pos6.x, blockLength + blockGap + 2);
-        curvePath.add(new Bezier<Vector2>(pos6, pos7));
+        curvePath.add(new Bezier<>(pos6, pos7));
 
         sum = 0;
         for (int i = 0; i < 3; i++) {
@@ -81,14 +81,14 @@ public class PathLoader {
 
 
         //load all the path using the templates
-        fromLeftToRight = new Array<Vector2>(straightPathPos);
+        fromLeftToRight = new Array<>(straightPathPos);
 
-        startFromLeft = new Array<Vector2>();
+        startFromLeft = new Array<>();
         for (int i = (int) (straightPathPos.size * 0.35); i < straightPathPos.size; i++) {
             startFromLeft.add(fromLeftToRight.get(i).cpy());
         }
 
-        fromRightToLeft = new Array<Vector2>();
+        fromRightToLeft = new Array<>();
         for (int i = 0; i < fromLeftToRight.size; i++) {
             fromRightToLeft.add(fromLeftToRight.get(i).cpy());
             fromRightToLeft.get(i).sub(blockLength / 2, blockLength / 2);
@@ -96,12 +96,12 @@ public class PathLoader {
             fromRightToLeft.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        startFromRight = new Array<Vector2>();
+        startFromRight = new Array<>();
         for (int i = (int) (straightPathPos.size * 0.35); i < straightPathPos.size; i++) {
             startFromRight.add(fromRightToLeft.get(i).cpy());
         }
 
-        fromBottomToTop = new Array<Vector2>();
+        fromBottomToTop = new Array<>();
         for (int i = 0; i < fromLeftToRight.size; i++) {
             fromBottomToTop.add(fromLeftToRight.get(i).cpy());
             fromBottomToTop.get(i).sub(blockLength / 2, blockLength / 2);
@@ -109,12 +109,12 @@ public class PathLoader {
             fromBottomToTop.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        startFromBottom = new Array<Vector2>();
+        startFromBottom = new Array<>();
         for (int i = (int) (straightPathPos.size * 0.35); i < straightPathPos.size; i++) {
             startFromBottom.add(fromBottomToTop.get(i).cpy());
         }
 
-        fromTopToBottom = new Array<Vector2>();
+        fromTopToBottom = new Array<>();
         for (int i = 0; i < fromBottomToTop.size; i++) {
             fromTopToBottom.add(fromBottomToTop.get(i).cpy());
             fromTopToBottom.get(i).sub(blockLength / 2, blockLength / 2);
@@ -122,15 +122,15 @@ public class PathLoader {
             fromTopToBottom.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        startFromTop = new Array<Vector2>();
+        startFromTop = new Array<>();
         for (int i = (int) (straightPathPos.size * 0.35); i < straightPathPos.size; i++) {
             startFromTop.add(fromTopToBottom.get(i).cpy());
         }
 
 
-        fromLeftToTop = new Array<Vector2>(curvePathPos);
+        fromLeftToTop = new Array<>(curvePathPos);
 
-        fromRightToBottom = new Array<Vector2>();
+        fromRightToBottom = new Array<>();
         for (int i = 0; i < curvePathPos.size; i++) {
             fromRightToBottom.add(fromLeftToTop.get(i).cpy());
             fromRightToBottom.get(i).sub(blockLength / 2, blockLength / 2);
@@ -138,7 +138,7 @@ public class PathLoader {
             fromRightToBottom.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        fromTopToRight = new Array<Vector2>();
+        fromTopToRight = new Array<>();
         for (int i = 0; i < curvePathPos.size; i++) {
             fromTopToRight.add(fromRightToBottom.get(i).cpy());
             fromTopToRight.get(i).sub(blockLength / 2, blockLength / 2);
@@ -146,7 +146,7 @@ public class PathLoader {
             fromTopToRight.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        fromBottomToLeft = new Array<Vector2>();
+        fromBottomToLeft = new Array<>();
         for (int i = 0; i < curvePathPos.size; i++) {
             fromBottomToLeft.add(fromTopToRight.get(i).cpy());
             fromBottomToLeft.get(i).sub(blockLength / 2, blockLength / 2);
@@ -155,7 +155,7 @@ public class PathLoader {
         }
 
         Matrix3 matrix = new Matrix3(new float[]{0, 1, 0, 1, 0, 0, 0, 0, 1});
-        fromLeftToBottom = new Array<Vector2>();
+        fromLeftToBottom = new Array<>();
         for (int i = 0; i < curvePathPos.size; i++) {
             fromLeftToBottom.add(fromBottomToLeft.get(i).cpy());
             fromLeftToBottom.get(i).sub(blockLength / 2, blockLength / 2);
@@ -163,7 +163,7 @@ public class PathLoader {
             fromLeftToBottom.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        fromRightToTop = new Array<Vector2>();
+        fromRightToTop = new Array<>();
         for (int i = 0; i < curvePathPos.size; i++) {
             fromRightToTop.add(fromLeftToBottom.get(i).cpy());
             fromRightToTop.get(i).sub(blockLength / 2, blockLength / 2);
@@ -171,7 +171,7 @@ public class PathLoader {
             fromRightToTop.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        fromTopToLeft = new Array<Vector2>();
+        fromTopToLeft = new Array<>();
         for (int i = 0; i < curvePathPos.size; i++) {
             fromTopToLeft.add(fromRightToTop.get(i).cpy());
             fromTopToLeft.get(i).sub(blockLength / 2, blockLength / 2);
@@ -179,13 +179,89 @@ public class PathLoader {
             fromTopToLeft.get(i).add(blockLength / 2, blockLength / 2);
         }
 
-        fromBottomToRight = new Array<Vector2>();
+        fromBottomToRight = new Array<>();
         for (int i = 0; i < curvePathPos.size; i++) {
             fromBottomToRight.add(fromTopToLeft.get(i).cpy());
             fromBottomToRight.get(i).sub(blockLength / 2, blockLength / 2);
             fromBottomToRight.get(i).rotate(180);
             fromBottomToRight.get(i).add(blockLength / 2, blockLength / 2);
         }
+    }
+
+    public static Array<Vector2> getPath(Direction enteringDir, Direction exitingDir, boolean isStartingPath){
+        //straight path
+        if (enteringDir.getVector().hasSameDirection(exitingDir.getVector())){
+            switch (enteringDir){
+                case TO_EAST:
+                    if (isStartingPath)
+                        return startFromLeft;
+                    else
+                        return fromLeftToRight;
+
+                case TO_WEST:
+                    if (isStartingPath)
+                        return startFromRight;
+                    else
+                        return fromRightToLeft;
+
+                case TO_NORTH:
+                    if (isStartingPath)
+                        return startFromBottom;
+                    else
+                        return fromBottomToTop;
+
+                case TO_SOUTH:
+                    if (isStartingPath)
+                        return startFromTop;
+                    else
+                        return fromTopToBottom;
+            }
+        }
+        //curved path
+        else if (enteringDir.getVector().isPerpendicular(exitingDir.getVector())){
+            switch (enteringDir){
+                case TO_EAST:
+                    switch (exitingDir){
+                        case TO_NORTH:
+                            return fromLeftToTop;
+
+                        case TO_SOUTH:
+                            return fromLeftToBottom;
+                    }
+                    break;
+
+                case TO_WEST:
+                    switch (exitingDir){
+                        case TO_NORTH:
+                            return fromRightToTop;
+
+                        case TO_SOUTH:
+                            return fromRightToBottom;
+                    }
+                    break;
+
+                case TO_NORTH:
+                    switch (exitingDir){
+                        case TO_EAST:
+                            return fromBottomToRight;
+
+                        case TO_WEST:
+                            return fromBottomToLeft;
+                    }
+                    break;
+
+                case TO_SOUTH:
+                    switch (exitingDir){
+                        case TO_EAST:
+                            return fromTopToRight;
+
+                        case TO_WEST:
+                            return fromTopToLeft;
+                    }
+                    break;
+            }
+        }
+        throw new RuntimeException("Invalid parameters");
     }
 
     public static void dispose(){

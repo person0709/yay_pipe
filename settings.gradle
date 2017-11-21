@@ -1,2 +1,2 @@
-include 'desktop', 'android', 'ios', 'html', 'core', ':baseGameUtils'
-project(':baseGameUtils').projectDir = new File('libs/baseGameUtils')
+include 'desktop', 'android', 'core', ':googleplayservice'
+project(':googleplayservice').projectDir = new File('libs/googleplayservice')

@@ -1,137 +1,127 @@
 package com.lazybean.yaypipe.gameobjects;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.Colour;
-import com.lazybean.yaypipe.GameWorld;
-import com.lazybean.yaypipe.gamehelper.PathLoader;
+import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.Difficulty;
+import com.lazybean.yaypipe.gamehelper.Direction;
+import com.lazybean.yaypipe.gamehelper.GridSize;
+import com.lazybean.yaypipe.gamehelper.PathLoader;
+
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
 
 public class Water extends Actor {
-    private final int TO_NORTH = 1;
-    private final int TO_EAST = 2;
-    private final int TO_SOUTH = 3;
-    private final int TO_WEST = 4;
-    private final Color WATER_COLOR = Colour.TURQUOISE;
-    private final float WATER_WIDTH = Block.LENGTH / 5f;
+    private final Color WATER_COLOR = CustomColor.TURQUOISE.getColor();
+    private final float WATER_WIDTH = GridBlock.BLOCK_LENGTH / 5f;
     private final float SAMPLE_DISTANCE = 2f;
+    private final float INITIAL_SPEED = 5f;
+    private final float SPEED_INCREASE_INTERVAL = 3f;
 
+    private Difficulty difficulty;
 
-    private float current = 0;
-    private float speed = 5f;
+    private Vector2 velocity;
 
-    private Array<Vector2> drawingPath = new Array<Vector2>();
+    // the positions of water blobs to be drawn up until the current block from the start
+    private Array<Vector2> drawingPath = new Array<>();
     private int drawingPathNum = 0;
-    private Array<Vector2> animatingPath = new Array<Vector2>();
 
-    private boolean isDone = false;
+    // the positions of water blobs to be drawn in the current block
+    private Array<Vector2> animatingPath = new Array<>();
+
+    // the index of animatingPath array that needs to be drawn up to. i.e. all the positions from index 0 to current need to be drawn
+    private float current = 0;
+
     private boolean isStop = false;
-    private boolean isFinal = false;
+    private boolean isFinalPipe = false;
+    private boolean isClear = false;
+    private boolean isSnailActive = false;
 
     private Vector2 stageCoordinates = new Vector2();
 
     private TextureRegion waterSquare;
     private TextureRegion waterCircle;
 
-    private int stopPoint = 1000;
 
-    private float speedLimit;
-    private float speedIncrease;
+    Water(AssetLoader assetLoader, Block startBlock, Difficulty difficulty) {
+        this.difficulty = difficulty;
+        Direction startingDir = startBlock.getPipe().getType().getOpenEnds().first();
+        velocity = new Vector2(startingDir.x * INITIAL_SPEED, startingDir.y * INITIAL_SPEED);
 
-    private Sound plusPoint = Gdx.audio.newSound(Gdx.files.internal("plusPoint.ogg"));
+        this.waterSquare = assetLoader.square;
+        this.waterCircle = assetLoader.circle;
 
-
-    Water(Block startBlock, int dir, TextureRegion waterSquare, TextureRegion waterCircle) {
-
-        this.waterSquare = waterSquare;
-        this.waterCircle = waterCircle;
-
-        switch (AssetLoader.prefs.getInteger("difficulty")){
-            case Difficulty.EASY:
-                speedIncrease = 0.005f;
-                speedLimit = 50f;
-                break;
-
-            case Difficulty.NORMAL:
-                speedIncrease = 0.007f;
-                speedLimit = 60f;
-                break;
-
-            case Difficulty.HARD:
-                speedIncrease = 0.008f;
-                speedLimit = 70f;
-                break;
-
-            case Difficulty.EXTREME:
-                speedIncrease = 0.01f;
-                speedLimit = 80f;
-                break;
-
-            case Difficulty.MASTER:
-                speedIncrease = 0.012f;
-                speedLimit = 90f;
-                break;
-
-            default:
-                speed = 0;
-                speedIncrease = 0f;
-                speedLimit = 10f;
-        }
-        Array<Vector2> startFromBottom = new Array<Vector2>(PathLoader.startFromBottom);
-        Array<Vector2> startFromTop = new Array<Vector2>(PathLoader.startFromTop);
-        Array<Vector2> startFromLeft = new Array<Vector2>(PathLoader.startFromLeft);
-        Array<Vector2> startFromRight = new Array<Vector2>(PathLoader.startFromRight);
+//        switch (AssetLoader.prefs.getInteger("difficulty")){
+//            case Difficulty.EASY:
+//                speedIncrease = 0.005f;
+//                speedLimit = 50f;
+//                break;
+//
+//            case Difficulty.NORMAL:
+//                speedIncrease = 0.007f;
+//                speedLimit = 60f;
+//                break;
+//
+//            case Difficulty.HARD:
+//                speedIncrease = 0.008f;
+//                speedLimit = 70f;
+//                break;
+//
+//            case Difficulty.EXTREME:
+//                speedIncrease = 0.01f;
+//                speedLimit = 80f;
+//                break;
+//
+//            case Difficulty.MASTER:
+//                speedIncrease = 0.012f;
+//                speedLimit = 90f;
+//                break;
+//
+//            default:
+//                speed = 0;
+//                speedIncrease = 0f;
+//                speedLimit = 10f;
+//        }
         startBlock.localToParentCoordinates(stageCoordinates);
-        switch (dir) {
-            case TO_NORTH:
-                addStraightWaterPath(startBlock, startFromBottom);
-                setBounds(startFromBottom.first().x + stageCoordinates.x - WATER_WIDTH/2,
-                        startFromBottom.first().y + stageCoordinates.y - WATER_WIDTH/2, WATER_WIDTH, WATER_WIDTH);
-                break;
 
-            case TO_EAST:
-                addStraightWaterPath(startBlock, startFromLeft);
-                setBounds(startFromLeft.first().x + stageCoordinates.x - WATER_WIDTH/2,
-                        startFromLeft.first().y + stageCoordinates.y - WATER_WIDTH/2, WATER_WIDTH, WATER_WIDTH);
-                break;
+        Array<Vector2> startingPath = PathLoader.getPath(startingDir, startingDir, true);
+        Vector2 tmp;
+        drawingPath.add(startingPath.first().cpy().add(stageCoordinates));
+        for (int i = 0; i < startingPath.size; i++) {
+            tmp = new Vector2(startingPath.get(i).cpy().add(stageCoordinates));
+            animatingPath.add(tmp.cpy());
 
-            case TO_SOUTH:
-                addStraightWaterPath(startBlock, startFromTop);
-                setBounds(startFromTop.first().x + stageCoordinates.x - WATER_WIDTH/2,
-                        startFromTop.first().y + stageCoordinates.y - WATER_WIDTH/2, WATER_WIDTH, WATER_WIDTH);
-                break;
-
-            case TO_WEST:
-                addStraightWaterPath(startBlock, startFromRight);
-                setBounds(startFromRight.first().x + stageCoordinates.x - WATER_WIDTH/2,
-                        startFromRight.first().y + stageCoordinates.y - WATER_WIDTH/2, WATER_WIDTH, WATER_WIDTH);
-                break;
+            if (drawingPath.peek().dst(tmp) > WATER_WIDTH/2) {
+                drawingPath.add(tmp.cpy());
+                drawingPathNum++;
+            }
         }
+        drawingPath.add(animatingPath.peek().cpy());
+        drawingPathNum++;
+
+        setBounds(startingPath.first().x + stageCoordinates.x - WATER_WIDTH/2,
+                startingPath.first().y + stageCoordinates.y - WATER_WIDTH/2, WATER_WIDTH, WATER_WIDTH);
+
         setOrigin(WATER_WIDTH/2, WATER_WIDTH/2);
     }
 
-    public void addStraightWaterPath(Actor block, Array<Vector2> waterPath) {
-        if (drawingPath.size != 0){
-            if (((Block) block).getStopNum() == 0) {
-                GameWorld.score.addScore(100, (Block) block, Score.PIPE_CONNECT, false);
-            }
-            else{
-                GameWorld.score.addScore(stopPoint, (Block) block, Score.STOP_PASS, false);
-                stopPoint += 1000;
-            }
-            plusPoint.play(AssetLoader.prefs.getFloat("soundVolume"));
-        }
+    public void addStraightWaterPath(GridBlock block, Direction direction) {
+        block.addFlowCount();
+
         animatingPath.clear();
         Vector2 tmp;
         stageCoordinates.setZero();
         block.localToParentCoordinates(stageCoordinates);
+
+        Array<Vector2> waterPath = PathLoader.getPath(direction, direction, false);
         drawingPath.add(waterPath.first().cpy().add(stageCoordinates));
         for (int i = 0; i < waterPath.size; i++) {
             tmp = new Vector2(waterPath.get(i).cpy().add(stageCoordinates));
@@ -146,11 +136,15 @@ public class Water extends Actor {
         drawingPathNum++;
     }
 
-    public void addCurvedWaterPath(Actor block, Array<Vector2> waterPath) {
+    public void addCurvedWaterPath(GridBlock block, Direction enteringDir, Direction exitingDir) {
+        block.addFlowCount();
+
         animatingPath.clear();
         Vector2 tmp;
         stageCoordinates.setZero();
         block.localToParentCoordinates(stageCoordinates);
+
+        Array<Vector2> waterPath = PathLoader.getPath(enteringDir, exitingDir, false);
         drawingPath.add(waterPath.first().cpy().add(stageCoordinates));
         for (int i = 0; i < waterPath.size; i++) {
             tmp = new Vector2(waterPath.get(i).cpy().add(stageCoordinates));
@@ -163,21 +157,19 @@ public class Water extends Actor {
         }
         drawingPath.add(animatingPath.peek().cpy());
         drawingPathNum++;
-        if (((Block) block).getStopNum() == 0) {
-            GameWorld.score.addScore(100, (Block) block, Score.PIPE_CONNECT, false);
-        }
-        else{
-            GameWorld.score.addScore(stopPoint, (Block) block, Score.STOP_PASS, false);
-            stopPoint += 1000;
-        }
-        plusPoint.play(AssetLoader.prefs.getFloat("soundVolume"));
+
+        float len = velocity.len();
+        velocity.x = exitingDir.x * len;
+        velocity.y = exitingDir.y * len;
     }
 
-    public void addFinalWaterPath(Actor block, Array<Vector2> waterPath){
+    public void addFinalWaterPath(GridBlock block, Direction direction){
         animatingPath.clear();
         Vector2 tmp;
         stageCoordinates.setZero();
         block.localToParentCoordinates(stageCoordinates);
+
+        Array<Vector2> waterPath = PathLoader.getPath(direction, direction, false);
         drawingPath.add(waterPath.first().cpy().add(stageCoordinates));
         for (int i = 0; i < waterPath.size * 0.65; i++) {
             tmp = new Vector2(waterPath.get(i).cpy().add(stageCoordinates));
@@ -190,58 +182,81 @@ public class Water extends Actor {
         }
         drawingPath.add(animatingPath.peek().cpy());
         drawingPathNum++;
-        GameWorld.score.addScore(500, (Block) block, Score.PIPE_CONNECT, false);
-        plusPoint.play(AssetLoader.prefs.getFloat("soundVolume"));
 
-        isFinal = true;
+        isFinalPipe = true;
     }
 
-    public void resetDone() {
-        isDone = false;
+    public void setSnail(boolean snail) {
+        this.isSnailActive = snail;
+
+        if (isSnailActive){
+            setVelocity(Snail.WATER_SPEED);
+        }
     }
 
-    public boolean isDone() {
-        return isDone;
-    }
-
+    /**
+     * stop water flow
+     */
     public void stop(){
         isStop = true;
     }
 
-    public boolean isStop(){
-        return isStop;
-    }
-
+    /**
+     * resume water flow
+     */
     public void resume(){
         isStop = false;
     }
 
-    public void setClear(boolean bool){
-        isFinal = bool;
-    }
-
-    public float getSpeedLimit(){
-        return speedLimit;
-    }
-
-    public float getSpeedIncrease(){
-        return speedIncrease;
-    }
-
-    public void setSpeed(float newSpeed){
-        if (newSpeed < speedLimit){
-            speed = newSpeed;
-        }
+    /**
+     * check if water reached the final pipe, hence clearing the game
+     */
+    public boolean isClear() {
+        return isClear;
     }
 
     public void skip(){
-        speed = 400f;
+        velocity.setLength(200f);
     }
 
-    public float getSpeed(){
-        return speed;
+    public Direction getDirection(){
+        if (velocity.x > 0){
+            return Direction.TO_EAST;
+        }
+        else if (velocity.x < 0){
+            return Direction.TO_WEST;
+        }
+        else if (velocity.y > 0){
+            return Direction.TO_NORTH;
+        }
+        else{
+            return Direction.TO_SOUTH;
+        }
     }
 
+    private void setVelocity(float speed){
+        Vector2 newVelocity = new Vector2(velocity);
+        newVelocity.nor();
+        newVelocity.scl(speed);
+        velocity = newVelocity;
+    }
+
+    private float timeCount = 0;
+    @Override
+    public void act(float delta) {
+        if (!isStop) {
+            current += (delta * velocity.len() / PathLoader.straightPathDerAvg * animatingPath.size);
+            timeCount += delta;
+        }
+
+        // speed increase every interval
+        if (timeCount > SPEED_INCREASE_INTERVAL && velocity.len() < difficulty.waterSpeedLimit && !isSnailActive){
+            timeCount = 0;
+            setVelocity(velocity.len() + difficulty.waterSpeedIncrease);
+        }
+
+        Gdx.app.log("currentSpeed", String.valueOf(velocity.len()));
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -250,6 +265,7 @@ public class Water extends Actor {
 
         batch.draw(waterCircle, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
 
+        // draws water flow in the current block
         for (int i = 0; i < (int) current; i++) {
             try {
                 batch.draw(waterCircle, animatingPath.get(i).x - WATER_WIDTH / 2,
@@ -259,13 +275,10 @@ public class Water extends Actor {
             }
         }
 
-        if (!isStop) {
-            current += (Gdx.graphics.getDeltaTime() * speed / PathLoader.straightPathDerAvg * animatingPath.size);
-        }
-
         if (current > animatingPath.size) {
-            if (isFinal) {
-                stop();
+            if (isFinalPipe) {
+                isStop = true;
+                isClear = true;
             }
             else{
 //                batch.end();
@@ -292,10 +305,11 @@ public class Water extends Actor {
 
                 drawingPathNum = 0;
                 current = 5;
-                isDone = true;
+                ((MainGrid)getParent()).checkNextBlock();
             }
         }
 
+        //draws water path so far
         for (int i = 0; i < drawingPath.size - drawingPathNum; i++) {
             try {
                 if (drawingPath.get(i).dst(drawingPath.get(i + 1)) <= WATER_WIDTH / 2 || i == 0 || i == drawingPath.size - (drawingPathNum +1)) {
@@ -313,7 +327,7 @@ public class Water extends Actor {
         }
 
 //        if (texture != null) {
-//            batch.draw(texture, getX(), getY(), Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//            batch.draw(texture, getX(), getY(), YayPipe.SCREEN_WIDTH, YayPipe.SCREEN_HEIGHT);
 //        }
 
         batch.setColor(color);

@@ -1,25 +1,35 @@
 package com.lazybean.yaypipe.gamehelper;
 
+import com.badlogic.gdx.utils.Array;
+
+import static com.lazybean.yaypipe.gamehelper.Direction.TO_EAST;
+import static com.lazybean.yaypipe.gamehelper.Direction.TO_NORTH;
+import static com.lazybean.yaypipe.gamehelper.Direction.TO_SOUTH;
+import static com.lazybean.yaypipe.gamehelper.Direction.TO_WEST;
+
 public enum PipeType {
-    TOP_BOTTOM(1),
-    LEFT_RIGHT(2),
-    LEFT_TOP(3),
-    LEFT_BOTTOM(4),
-    RIGHT_TOP(5),
-    RIGHT_BOTTOM(6),
-    ALL_DIRECTION(7),
-    BOTTOM_END(8),
-    LEFT_END(9),
-    TOP_END(10),
-    RIGHT_END(11);
+    TOP_BOTTOM(TO_NORTH, TO_SOUTH),
+    LEFT_RIGHT(TO_EAST, TO_WEST),
+    LEFT_TOP(TO_WEST, TO_NORTH),
+    LEFT_BOTTOM(TO_WEST, TO_SOUTH),
+    RIGHT_TOP(TO_EAST, TO_NORTH),
+    RIGHT_BOTTOM(TO_EAST, TO_SOUTH),
+    ALL_DIRECTION(TO_SOUTH, TO_EAST, TO_NORTH, TO_WEST),
+    BOTTOM_END(TO_NORTH), //pipe that ends on the bottom end (U shaped)
+    LEFT_END(TO_EAST), // C shaped
+    TOP_END(TO_SOUTH),
+    RIGHT_END(TO_WEST);
 
-    private int pipeNum;
+    /**
+     * the direction the pipe's open ends are facing towards
+     */
+    private Array<Direction> openEnds;
 
-    PipeType(int pipeNum){
-        this.pipeNum = pipeNum;
+    PipeType(Direction... openEnds){
+        this.openEnds = new Array<>(openEnds);
     }
 
-    public int getPipeNum(){
-        return pipeNum;
+    public Array<Direction> getOpenEnds() {
+        return openEnds;
     }
 }

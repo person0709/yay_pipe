@@ -4,30 +4,56 @@ Google Play game services IDs.
 Save this file as res/values/games-ids.xml in your project.
 -->
 <resources>
-    <string name="app_id">197469231763</string>
-    <string name="package_name">com.jeff_sue.yaypipe_gdx</string>
-    <string name="achievement_welcome_to_yaypipe">CgkIk7XV0N8FEAIQAQ</string>
-    <string name="achievement_the_first_step">CgkIk7XV0N8FEAIQAg</string>
-    <string name="achievement_youre_getting_there">CgkIk7XV0N8FEAIQAw</string>
-    <string name="achievement_wasnt_too_hard_eh">CgkIk7XV0N8FEAIQBA</string>
-    <string name="achievement_piping_hot">CgkIk7XV0N8FEAIQBQ</string>
-    <string name="achievement_mario_will_be_proud">CgkIk7XV0N8FEAIQBg</string>
-    <string name="achievement_novice_plumber">CgkIk7XV0N8FEAIQBw</string>
-    <string name="achievement_mediocre_plumber">CgkIk7XV0N8FEAIQCA</string>
-    <string name="achievement_professional_plumber">CgkIk7XV0N8FEAIQCQ</string>
-    <string name="achievement_expert_plumber">CgkIk7XV0N8FEAIQCg</string>
-    <string name="achievement_master_plumber">CgkIk7XV0N8FEAIQCw</string>
-    <string name="achievement_coward">CgkIk7XV0N8FEAIQDA</string>
-    <string name="achievement_its_aul_good_man">CgkIk7XV0N8FEAIQDQ</string>
-    <string name="achievement_youre_on_fire">CgkIk7XV0N8FEAIQDg</string>
-    <string name="achievement_very_resourceful">CgkIk7XV0N8FEAIQDw</string>
-    <string name="achievement_sore_finger">CgkIk7XV0N8FEAIQEA</string>
-    <string name="achievement_be_water_my_friend">CgkIk7XV0N8FEAIQEQ</string>
-    <string name="achievement_careful_planner">CgkIk7XV0N8FEAIQEg</string>
-    <string name="achievement_keep_it_up">CgkIk7XV0N8FEAIQEw</string>
-    <string name="achievement_no_pain_no_flow">CgkIk7XV0N8FEAIQFA</string>
-    <string name="achievement_try_hard">CgkIk7XV0N8FEAIQFQ</string>
-    <string name="achievement_too_much_free_time">CgkIk7XV0N8FEAIQFg</string>
-    <string name="leaderboard_high_score">CgkIk7XV0N8FEAIQGA</string>
-    <string name="leaderboard_total_play_time">CgkIk7XV0N8FEAIQFw</string>
+    <!-- app_id -->
+    <string name="app_id" translatable="false">197469231763</string>
+    <!-- package_name -->
+    <string name="package_name" translatable="false">com.lazybean.yaypipe</string>
+    <!-- achievement Welcome -->
+    <string name="achievement_welcome" translatable="false">CgkIk7XV0N8FEAIQAQ</string>
+    <!-- achievement Too Easy -->
+    <string name="achievement_too_easy" translatable="false">CgkIk7XV0N8FEAIQAg</string>
+    <!-- achievement Start Plumbing -->
+    <string name="achievement_start_plumbing" translatable="false">CgkIk7XV0N8FEAIQAw</string>
+    <!-- achievement Not Hard Enough -->
+    <string name="achievement_not_hard_enough" translatable="false">CgkIk7XV0N8FEAIQBA</string>
+    <!-- achievement Piping Hot -->
+    <string name="achievement_piping_hot" translatable="false">CgkIk7XV0N8FEAIQBQ</string>
+    <!-- achievement Mario Will Be Proud -->
+    <string name="achievement_mario_will_be_proud" translatable="false">CgkIk7XV0N8FEAIQBg</string>
+    <!-- achievement Novice Plumber -->
+    <string name="achievement_novice_plumber" translatable="false">CgkIk7XV0N8FEAIQBw</string>
+    <!-- achievement Mediocre Plumber -->
+    <string name="achievement_mediocre_plumber" translatable="false">CgkIk7XV0N8FEAIQCA</string>
+    <!-- achievement Professional Plumber -->
+    <string name="achievement_professional_plumber" translatable="false">CgkIk7XV0N8FEAIQCQ</string>
+    <!-- achievement Expert Plumber -->
+    <string name="achievement_expert_plumber" translatable="false">CgkIk7XV0N8FEAIQCg</string>
+    <!-- achievement Master Plumber -->
+    <string name="achievement_master_plumber" translatable="false">CgkIk7XV0N8FEAIQCw</string>
+    <!-- achievement Coward -->
+    <string name="achievement_coward" translatable="false">CgkIk7XV0N8FEAIQDA</string>
+    <!-- achievement Things Happen -->
+    <string name="achievement_things_happen" translatable="false">CgkIk7XV0N8FEAIQDQ</string>
+    <!-- achievement On Fire -->
+    <string name="achievement_on_fire" translatable="false">CgkIk7XV0N8FEAIQDg</string>
+    <!-- achievement Very Resourceful -->
+    <string name="achievement_very_resourceful" translatable="false">CgkIk7XV0N8FEAIQDw</string>
+    <!-- achievement Sore Finger -->
+    <string name="achievement_sore_finger" translatable="false">CgkIk7XV0N8FEAIQEA</string>
+    <!-- achievement Be Water, My Friend -->
+    <string name="achievement_be_water_my_friend" translatable="false">CgkIk7XV0N8FEAIQEQ</string>
+    <!-- achievement Careful Planner -->
+    <string name="achievement_careful_planner" translatable="false">CgkIk7XV0N8FEAIQEg</string>
+    <!-- achievement Try Hard -->
+    <string name="achievement_try_hard" translatable="false">CgkIk7XV0N8FEAIQEw</string>
+    <!-- achievement No Pain, No Flow -->
+    <string name="achievement_no_pain_no_flow" translatable="false">CgkIk7XV0N8FEAIQFA</string>
+    <!-- achievement Keep Calm And Plumb On -->
+    <string name="achievement_keep_calm_and_plumb_on" translatable="false">CgkIk7XV0N8FEAIQFQ</string>
+    <!-- achievement Too Much Free Time -->
+    <string name="achievement_too_much_free_time" translatable="false">CgkIk7XV0N8FEAIQFg</string>
+    <!-- leaderboard High Score -->
+    <string name="leaderboard_high_score" translatable="false">CgkIk7XV0N8FEAIQGA</string>
+    <!-- leaderboard Total Play Time -->
+    <string name="leaderboard_total_play_time" translatable="false">CgkIk7XV0N8FEAIQFw</string>
 </resources>

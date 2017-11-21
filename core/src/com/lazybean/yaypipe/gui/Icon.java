@@ -1,6 +1,5 @@
 package com.lazybean.yaypipe.gui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -8,119 +7,99 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.ScaleToAction;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Align;
-import com.lazybean.yaypipe.gameobjects.Block;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.lazybean.yaypipe.YayPipe;
+import com.lazybean.yaypipe.gamehelper.AssetLoader;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
+import com.lazybean.yaypipe.gamehelper.IconType;
+import com.lazybean.yaypipe.gamehelper.SoundType;
 
-public class Icon extends Group {
-    public static final int BACK = 0;
-    public static final int PAUSE = 1;
-    public static final int UNDO = 2;
-    public static final int FAST_FORWARD = 3;
+public class Icon extends Actor {
+    public static final float MENU_DIAMETER = YayPipe.SCREEN_WIDTH * 0.11f;
+    public static final float ITEM_DIAMETER = YayPipe.SCREEN_WIDTH * 0.15f;
 
-    private TextureRegion background, icon;
-    private Label number;
-    private float diameter;
+    private TextureRegion background, iconTexture;
 
-    private ScaleToAction scaleToAction = new ScaleToAction();
+    private boolean isAble = true;
+    private boolean isTouched;
 
-    public Icon(TextureRegion background, TextureRegion icon){
-        this.background = background;
-        this.icon = icon;
+    public Icon(final AssetLoader assetLoader, IconType iconType, float diameter){
+        this.background = assetLoader.circle;
+        this.iconTexture = assetLoader.getIconTexture(iconType);
 
-        diameter = Gdx.graphics.getWidth() * 0.11f;
-        setBounds(0,0,diameter, diameter);
+        setBounds(0,0, diameter, diameter);
         setOrigin(getWidth()/2, getHeight()/2);
 
-        this.addListener(new InputListener(){
+        addListener(new InputListener(){
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                scaleToAction.reset();
-                scaleToAction.setScale(0.9f);
-                scaleToAction.setDuration(0.05f);
-
-                addAction(scaleToAction);
+                addAction(Actions.scaleTo(1.2f, 1.2f, 0.1f));
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                scaleToAction.reset();
-                scaleToAction.setScale(1f);
-                scaleToAction.setDuration(0.05f);
+                addAction(Actions.scaleTo(1f, 1f, 0.1f));
+            }
+        });
 
-                addAction(scaleToAction);
+        addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (isAble) {
+                    isTouched = true;
+                    if (GameData.getInstance().isSoundOn()) {
+                        assetLoader.getSound(SoundType.CLICK).play(GameData.getInstance().getSoundVolume());
+                    }
+                }
             }
         });
     }
 
-    public Icon (TextureRegion background, Label number){
-        this.background = background;
-        diameter = Block.LENGTH * 0.4f;
-        setBounds(0,0,diameter, diameter);
-        setOrigin(getWidth()/2, getHeight()/2);
-
-        this.number = number;
-        this.number.setBounds(getX(), getY(), getWidth(), getHeight());
-        this.number.setAlignment(Align.center);
-        addActor(this.number);
+    public void setIconImage(TextureRegion iconTexture){
+        this.iconTexture = iconTexture;
     }
 
-    public Icon (Icon copy){
-        this.background = copy.getBackground();
-        diameter = Block.LENGTH * 0.35f;
-        setBounds(0,0,diameter, diameter);
-        setOrigin(getWidth()/2, getHeight()/2);
-
-        Label.LabelStyle labelStyle = new Label.LabelStyle(copy.getNumber().getStyle());
-        Label label = new Label(copy.getNumber().getText(),labelStyle);
-        label.setBounds(getX(), getY(), getWidth(), getHeight());
-        label.setFontScale(0.8f);
-        label.setAlignment(Align.center);
-
-        addActor(label);
+    public boolean isTouched() {
+        return isTouched;
     }
 
-    public void setIconImage(TextureRegion icon){
-        this.icon = icon;
+    public void setTouched(boolean touched) {
+        isTouched = touched;
     }
 
     public void setDiameter(float diameter){
-        this.diameter = diameter;
         setBounds(0,0,diameter, diameter);
         setOrigin(getWidth()/2, getHeight()/2);
     }
 
-    public void setDisable(){
-        Color color = getColor();
-        setColor(color.r, color.g, color.b, 0.5f);
+    public void setDim(boolean dim) {
+        if (dim) {
+            Color color = getColor();
+            setColor(color.r, color.g, color.b, 0.5f);
+        }
+        else{
+            Color color = getColor();
+            setColor(color.r, color.g, color.b, 1f);
+        }
     }
 
-    public void setAble() {
-        Color color = getColor();
-        setColor(color.r, color.g, color.b, 1);
-    }
-
-    public TextureRegion getBackground(){
-        return background;
-    }
-
-    public Label getNumber(){
-        return number;
+    public void setAble(boolean able){
+        isAble = able;
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.setColor(getColor());
+        Color color = getColor();
+        batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
         batch.draw(background, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
                 getScaleX(), getScaleY(), getRotation());
 
-        batch.setColor(1,1,1,getColor().a);
-        if (icon != null) {
-            batch.draw(icon, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
+        batch.setColor(1,1,1, color.a * parentAlpha);
+        batch.draw(iconTexture, getX(), getY(), getOriginX(), getOriginY(), getWidth(), getHeight(),
                     getScaleX(), getScaleY(), getRotation());
-        }
-        super.draw(batch, parentAlpha);
+
         batch.setColor(Color.WHITE);
     }
 }
