@@ -60,6 +60,8 @@ public class GamePausedWindow extends GameWindow {
         soundIcon = new Icon(assetLoader, IconType.SOUND, Icon.MENU_DIAMETER);
         if (GameData.getInstance().isSoundOn()){
             soundIcon.setIconImage(assetLoader.getIconTexture(IconType.SOUND));
+        } else{
+            soundIcon.setIconImage(assetLoader.getIconTexture(IconType.SOUND_OFF));
         }
         soundIcon.setColor(CustomColor.INDIGO.getColor());
         soundIcon.addListener(new InputListener() {
