@@ -54,7 +54,7 @@ public class GameOverWindow extends GameWindow{
     private TweenManager tweenManager;
 
     public GameOverWindow(AssetLoader assetLoader, final boolean isClear, GameWorld gameWorld) {
-        super("", assetLoader.uiSkin, gameWorld);
+        super(assetLoader.uiSkin, gameWorld);
 
         this.score = gameWorld.getScore();
         this.coinBank = GameData.getInstance().coinBank;

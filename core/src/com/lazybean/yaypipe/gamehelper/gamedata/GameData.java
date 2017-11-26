@@ -19,7 +19,7 @@ public class GameData {
 
     private GameData() {
         preferences = Gdx.app.getPreferences("YayPipe");
-        if (preferences.getBoolean("isFirstRun", false)){
+        if (preferences.getBoolean("isFirstRun", true)){
             unlock = new Unlock();
             coinBank = new CoinBank();
             statistics = new Statistics();
@@ -29,6 +29,7 @@ public class GameData {
             preferences.putBoolean("itemUnlocked", false);
             preferences.putInteger("wandStock", 0);
             preferences.putInteger("snailStock", 0);
+            preferences.putBoolean("isFirstRun", false);
             preferences.flush();
         }
         else{

@@ -19,6 +19,5 @@ public enum AchievementType {
     SORE_FINGER,
     BE_WATER_MY_FRIEND,
     CAREFUL_PLANNER,
-    PLAY_TIME,
-    TOO_MUCH_FREE_TIME
+    PLAY_TIME
 }

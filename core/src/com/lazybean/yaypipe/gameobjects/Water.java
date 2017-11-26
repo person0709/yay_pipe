@@ -24,7 +24,7 @@ public class Water extends Actor {
     private final float WATER_WIDTH = GridBlock.BLOCK_LENGTH / 5f;
     private final float SAMPLE_DISTANCE = 2f;
     private final float INITIAL_SPEED = 5f;
-    private final float SPEED_INCREASE_INTERVAL = 3f;
+    private final float SPEED_INCREASE_INTERVAL = 5f;
 
     private Difficulty difficulty;
 
@@ -59,37 +59,6 @@ public class Water extends Actor {
         this.waterSquare = assetLoader.square;
         this.waterCircle = assetLoader.circle;
 
-//        switch (AssetLoader.prefs.getInteger("difficulty")){
-//            case Difficulty.EASY:
-//                speedIncrease = 0.005f;
-//                speedLimit = 50f;
-//                break;
-//
-//            case Difficulty.NORMAL:
-//                speedIncrease = 0.007f;
-//                speedLimit = 60f;
-//                break;
-//
-//            case Difficulty.HARD:
-//                speedIncrease = 0.008f;
-//                speedLimit = 70f;
-//                break;
-//
-//            case Difficulty.EXTREME:
-//                speedIncrease = 0.01f;
-//                speedLimit = 80f;
-//                break;
-//
-//            case Difficulty.MASTER:
-//                speedIncrease = 0.012f;
-//                speedLimit = 90f;
-//                break;
-//
-//            default:
-//                speed = 0;
-//                speedIncrease = 0f;
-//                speedLimit = 10f;
-//        }
         startBlock.localToParentCoordinates(stageCoordinates);
 
         Array<Vector2> startingPath = PathLoader.getPath(startingDir, startingDir, true);

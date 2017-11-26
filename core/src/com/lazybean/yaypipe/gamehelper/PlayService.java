@@ -1,12 +1,13 @@
 package com.lazybean.yaypipe.gamehelper;
 
 public interface PlayService {
-    String SKU_REMOVE_ADS = "test_product_1";
-    int RC_REQUEST = 10001;
+    int RC_SIGN_IN = 9001;
+    int RC_ACHIEVEMENT_UI = 9003;
 
-    void signIn();
+
+    void startSignInIntent();
+    void signInSilently();
     void signOut();
-    void rateGame();
     void unlockAchievement(AchievementType achievementType);
     void incrementAchievement(AchievementType achievementType, int count);
     void submitScore(int highScore);
@@ -14,5 +15,6 @@ public interface PlayService {
     void showLeaderBoards();
     boolean isSignedIn();
 
-    void removeAds();
+    void saveGame(String json);
+    void loadGame();
 }

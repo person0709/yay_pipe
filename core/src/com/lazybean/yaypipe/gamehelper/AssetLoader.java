@@ -10,14 +10,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.lazybean.yaypipe.YayPipe;
+import com.lazybean.yaypipe.gui.Background;
 
 
 public final class AssetLoader {
@@ -44,7 +47,7 @@ public final class AssetLoader {
     public TextureRegion shadow;
     public TextureRegion line;
 
-    public NinePatchDrawable window, itemTray;
+    public NinePatchDrawable button, window, itemTray;
 
     public TextureRegion waterDrop;
 
@@ -139,6 +142,7 @@ public final class AssetLoader {
         e = new TextureRegion(imageAtlas.findRegion("e"));
         itemTray = new NinePatchDrawable(imageAtlas.createPatch("itemTray"));
         window = new NinePatchDrawable(imageAtlas.createPatch("window"));
+        button = new NinePatchDrawable(imageAtlas.createPatch("button"));
 
         iconAtlas = manager.get("asset_icon.atlas");
 
@@ -198,6 +202,11 @@ public final class AssetLoader {
         uiSkin.add("scoreEffect", labelStyle);
 
         Window.WindowStyle windowStyle = new Window.WindowStyle(getFont(FontType.ANJA_MEDIUM_LARGE), Color.BLACK, window);
+        Pixmap background = new Pixmap(1,1, Pixmap.Format.RGBA4444);
+        background.setColor(0,0,0,0.7f);
+        background.fill();
+        windowStyle.stageBackground = new TextureRegionDrawable(new TextureRegion(new Texture(background)));
+        background.dispose();
         uiSkin.add("default", windowStyle);
     }
 

@@ -1,130 +1,138 @@
 
 asset_icon.png
-format: RGBA4444
+size: 2048,128
+format: RGBA8888
 filter: Nearest,Linear
 repeat: none
 badgeArrow
   rotate: false
-  xy: 1, 103
+  xy: 410, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 cross
   rotate: false
-  xy: 1, 1
+  xy: 920, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 fastForward
   rotate: false
-  xy: 103, 103
+  xy: 1022, 2
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+googlePlay
+  rotate: false
+  xy: 1328, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 home
   rotate: false
-  xy: 103, 1
+  xy: 2, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 item
   rotate: false
-  xy: 205, 103
+  xy: 1430, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 lock
   rotate: false
-  xy: 205, 1
+  xy: 716, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pause
   rotate: false
-  xy: 307, 103
+  xy: 308, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 restart
   rotate: false
-  xy: 307, 1
+  xy: 1124, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 resume
   rotate: false
-  xy: 409, 103
+  xy: 818, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 settings
   rotate: false
-  xy: 409, 1
+  xy: 206, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 share
   rotate: false
-  xy: 511, 103
+  xy: 1634, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 snail
   rotate: false
-  xy: 511, 1
+  xy: 512, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 sound
   rotate: false
-  xy: 613, 103
+  xy: 1736, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 soundOff
   rotate: false
-  xy: 613, 1
+  xy: 104, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 undo
   rotate: false
-  xy: 715, 103
+  xy: 1532, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 wand
   rotate: false
-  xy: 715, 1
+  xy: 1226, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 zoomIn
   rotate: false
-  xy: 817, 103
+  xy: 1838, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 zoomOut
   rotate: false
-  xy: 817, 1
+  xy: 614, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0

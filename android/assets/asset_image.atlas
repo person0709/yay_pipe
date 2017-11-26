@@ -2,7 +2,7 @@
 asset_image.png
 size: 1024,512
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Nearest,Linear
 repeat: none
 a
   rotate: false
@@ -13,9 +13,18 @@ a
   index: -1
 animation_water
   rotate: false
-  xy: 870, 286
+  xy: 403, 28
   size: 64, 64
   orig: 64, 64
+  offset: 0, 0
+  index: -1
+button
+  rotate: false
+  xy: 870, 284
+  size: 66, 66
+  split: 30, 30, 30, 30
+  pad: 0, 0, 0, 0
+  orig: 66, 66
   offset: 0, 0
   index: -1
 coin
@@ -99,49 +108,49 @@ piggy
   index: -1
 pipe_be
   rotate: false
-  xy: 607, 21
+  xy: 381, 196
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_lr
   rotate: false
-  xy: 505, 123
+  xy: 403, 94
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_lrtb
   rotate: false
-  xy: 505, 21
+  xy: 607, 123
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_rb
   rotate: false
-  xy: 763, 143
+  xy: 505, 21
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_re
   rotate: false
-  xy: 403, 94
+  xy: 763, 143
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_tb
   rotate: false
-  xy: 381, 196
+  xy: 607, 21
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 redBlock
   rotate: false
-  xy: 607, 123
+  xy: 505, 123
   size: 100, 100
   orig: 100, 100
   offset: 0, 0

@@ -23,7 +23,7 @@ public class GamePausedWindow extends GameWindow {
     public Icon resumeIcon, soundIcon, restartIcon, quitIcon;
 
     public GamePausedWindow(final AssetLoader assetLoader, GameWorld gameWorld){
-        super("", assetLoader.uiSkin, gameWorld);
+        super(assetLoader.uiSkin, gameWorld);
 
         setColor(getColor().r, getColor().g, getColor().b, 0f);
 

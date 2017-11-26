@@ -18,7 +18,8 @@ public enum IconType {
     SNAIL("snail"),
     WAND("wand"),
     SETTINGS("settings"),
-    LOCK("lock");
+    LOCK("lock"),
+    GOOGLE_PLAY("googlePlay");
 
     public String fileName;
 

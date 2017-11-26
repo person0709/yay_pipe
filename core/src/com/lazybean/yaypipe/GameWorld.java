@@ -256,6 +256,9 @@ public class GameWorld {
             YayPipe.playService.unlockAchievement(AchievementType.CAREFUL_PLANNER);
         }
 
+        // keep calm and plumb on, no pain no flow, try hard achievement
+        YayPipe.playService.incrementAchievement(AchievementType.PLAY_TIME, 1);
+
         setState(GameState.IDLE);
     }
 

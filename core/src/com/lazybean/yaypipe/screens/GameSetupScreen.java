@@ -7,10 +7,12 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
@@ -91,16 +93,19 @@ public class GameSetupScreen extends GameScreen{
         };
 
 
-        table.add(pageScrollPane).padBottom(YayPipe.SCREEN_HEIGHT * 0.05f).expandX().row();
+        table.add(pageScrollPane).padBottom(YayPipe.SCREEN_HEIGHT * 0.04f).expandX().row();
 
 
         TextButtonStyle textButtonStyle = new TextButtonStyle();
         textButtonStyle.font = assetLoader.getFont(FontType.ANJA_MEDIUM);
         textButtonStyle.fontColor = Color.BLACK;
+        textButtonStyle.up = assetLoader.button;
         textButtonStyle.pressedOffsetY = -10;
+        textButtonStyle.pressedOffsetX = 10;
 
         Table navigateTable = new Table();
         next = new TextButton("NEXT", textButtonStyle);
+        next.pad(Value.percentWidth(0.1f));
         next.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -114,6 +119,7 @@ public class GameSetupScreen extends GameScreen{
         });
 
         back = new TextButton("BACK", textButtonStyle);
+        back.pad(Value.percentWidth(0.1f));
         back.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -133,8 +139,8 @@ public class GameSetupScreen extends GameScreen{
         table.add(navigateTable).padBottom(YayPipe.SCREEN_HEIGHT * 0.1f).expandX().row();
 
 
-        textButtonStyle.font = assetLoader.getFont(FontType.ANJA_MEDIUM_LARGE);
         start = new TextButton("START!", textButtonStyle);
+        start.pad(Value.percentWidth(0.1f));
         start.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

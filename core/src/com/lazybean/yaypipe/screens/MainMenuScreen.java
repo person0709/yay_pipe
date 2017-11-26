@@ -13,21 +13,25 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
+import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.SoundType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
+import com.lazybean.yaypipe.gui.GameSettingWindow;
 import com.lazybean.yaypipe.gui.Icon;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gui.QuitWindow;
@@ -65,10 +69,18 @@ public class MainMenuScreen extends GameScreen{
 
         quitWindow = new QuitWindow(assetLoader);
 
+        final GameSettingWindow settingWindow = new GameSettingWindow(assetLoader);
+
         settings = new Icon(assetLoader, IconType.SETTINGS, Icon.MENU_DIAMETER);
         settings.setColor(Color.BLACK);
         settings.setDiameter(settings.getHeight() * 0.8f);
         settings.setPosition(YayPipe.SCREEN_WIDTH - settings.getWidth() * 1.2f, YayPipe.SCREEN_HEIGHT - settings.getHeight() * 1.2f);
+        settings.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                settingWindow.show(stage);
+            }
+        });
 
         stage.addActor(settings);
 
@@ -179,7 +191,8 @@ public class MainMenuScreen extends GameScreen{
         test.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                YayPipe.playService.removeAds();
+//                YayPipe.adHelper.removeAds();
+                YayPipe.playService.unlockAchievement(AchievementType.WELCOME);
             }
         });
 
