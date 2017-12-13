@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.FontType;
+import com.lazybean.yaypipe.gamehelper.Stopwatch;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
 import com.lazybean.yaypipe.gui.Background;
@@ -84,7 +85,7 @@ public class StatisticsScreen implements Screen {
         Label.LabelStyle labelStyle = new Label.LabelStyle(assetLoader.getFont(FontType.NOTO_EXTRA_SMALL), Color.BLACK);
 
         Label totalPlayTime_label = new Label("Total Play Time",labelStyle);
-        Label totalPlayTime_value = new Label(statistics.convertSecondToHour(statistics.get(StatisticsType.TOTAL_PLAYTIME)), labelStyle);
+        Label totalPlayTime_value = new Label(Stopwatch.convertSecondToHour(statistics.get(StatisticsType.TOTAL_PLAYTIME)), labelStyle);
 
         Label totalPipePlaced_label = new Label("Total PipeType Placed", labelStyle);
         Label totalPipePlaced_value = new Label(String.valueOf(statistics.get(StatisticsType.TOTAL_PIPE)), labelStyle);
@@ -146,7 +147,7 @@ public class StatisticsScreen implements Screen {
             easyTime_value = new Label("N/A", labelStyle);
         }
         else {
-            easyTime_value = new Label(statistics.convertSecondToMinute(value), labelStyle);
+            easyTime_value = new Label(Stopwatch.convertSecondToMinute(value), labelStyle);
         }
 
         Label normalTime_label = new Label("Normal", labelStyle);
@@ -156,7 +157,7 @@ public class StatisticsScreen implements Screen {
             normalTime_value = new Label("N/A", labelStyle);
         }
         else {
-            normalTime_value = new Label(statistics.convertSecondToMinute(value), labelStyle);
+            normalTime_value = new Label(Stopwatch.convertSecondToMinute(value), labelStyle);
         }
 
         Label hardTime_label = new Label("Hard", labelStyle);
@@ -166,7 +167,7 @@ public class StatisticsScreen implements Screen {
             hardTime_value = new Label("N/A", labelStyle);
         }
         else {
-            hardTime_value = new Label(statistics.convertSecondToMinute(value), labelStyle);
+            hardTime_value = new Label(Stopwatch.convertSecondToMinute(value), labelStyle);
         }
 
         Label proTime_label = new Label("Extreme", labelStyle);
@@ -176,7 +177,7 @@ public class StatisticsScreen implements Screen {
             proTime_value = new Label("N/A", labelStyle);
         }
         else {
-            proTime_value = new Label(statistics.convertSecondToMinute(value), labelStyle);
+            proTime_value = new Label(Stopwatch.convertSecondToMinute(value), labelStyle);
         }
 
         Label masterTime_label = new Label("Master", labelStyle);
@@ -186,7 +187,7 @@ public class StatisticsScreen implements Screen {
             masterTime_value = new Label("N/A", labelStyle);
         }
         else {
-            masterTime_value = new Label(statistics.convertSecondToMinute(value), labelStyle);
+            masterTime_value = new Label(Stopwatch.convertSecondToMinute(value), labelStyle);
         }
 
         Label mostPipeConnected_label = new Label("Most Pipes Connected", labelStyle);

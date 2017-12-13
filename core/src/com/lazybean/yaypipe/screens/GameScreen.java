@@ -25,7 +25,6 @@ import aurelienribon.tweenengine.equations.Linear;
 
 public abstract class GameScreen implements Screen {
     protected YayPipe game;
-    protected Stage stage;
     protected Background background;
     protected TweenManager tweenManager;
 
@@ -35,8 +34,6 @@ public abstract class GameScreen implements Screen {
     public GameScreen(YayPipe game, Color backgroundColour){
         this.game = game;
         this.backgroundColour = backgroundColour;
-
-        stage = new Stage(new ScreenViewport(), game.stage.getBatch());
 
         tweenManager = new TweenManager();
     }
@@ -85,11 +82,6 @@ public abstract class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-        stage.dispose();
         tweenManager.killAll();
-    }
-
-    public Stage getStage(){
-        return stage;
     }
 }

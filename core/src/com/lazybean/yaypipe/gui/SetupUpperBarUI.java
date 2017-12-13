@@ -11,18 +11,17 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.gamedata.CoinBank;
+import com.lazybean.yaypipe.gamehelper.NumberAnimator;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
-import com.lazybean.yaypipe.screens.MainMenuScreen;
 
 
 public class SetupUpperBarUI extends UpperBarUI {
     private YayPipe game;
 
+    public NumberAnimator coinAnimator;
     private Label balance;
-    private CoinBank coinBank;
 
     public Icon backIcon;
 
@@ -30,7 +29,9 @@ public class SetupUpperBarUI extends UpperBarUI {
         super(assetLoader);
         this.game = game;
 
-        coinBank = GameData.getInstance().coinBank;
+        coinAnimator = new NumberAnimator(GameData.getInstance().getCoin(), GameData.getInstance().getCoin(),
+                50, 0, 0);
+        coinAnimator.start();
 
         Table controlIcons = new Table();
         controlIcons.align(Align.left);
@@ -63,13 +64,12 @@ public class SetupUpperBarUI extends UpperBarUI {
         Image coin = new Image(assetLoader.coin);
         coin.setScaling(Scaling.fillX);
 
-        /*
-          test purpose
-         */
+        // TODO: 26/11/2017 added for debug purposes, remove later
         coin.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                GameData.getInstance().coinBank.addBalance(1000);
+                GameData.getInstance().addCoin(1000);
+                coinAnimator.setTargetNum(GameData.getInstance().getCoin());
             }
         });
 
@@ -77,7 +77,7 @@ public class SetupUpperBarUI extends UpperBarUI {
         coinLabel.setColor(Color.BLACK);
         coinLabel.setAlignment(Align.right);
 
-        balance = new Label(String.valueOf(coinBank.getBalance()), assetLoader.uiSkin, "setupUpperUIValue");
+        balance = new Label(String.valueOf(GameData.getInstance().getCoin()), assetLoader.uiSkin, "setupUpperUIValue");
         balance.setColor(Color.BLACK);
         balance.setAlignment(Align.right);
 
@@ -90,12 +90,12 @@ public class SetupUpperBarUI extends UpperBarUI {
     @Override
     public void act(float delta) {
         super.act(delta);
-        coinBank.update(50);
-        balance.setText(String.valueOf(coinBank.getCurrentBalance()));
+        coinAnimator.update(delta);
+        balance.setText(String.valueOf(coinAnimator.getCurrentNum()));
 
         if (backIcon.isTouched()){
             backIcon.setTouched(false);
-            game.setScreen(new MainMenuScreen(game));
+            game.setScreen(game.screenManager.getMainMenuScreen());
         }
     }
 }

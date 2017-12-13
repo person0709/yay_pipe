@@ -71,7 +71,7 @@ public class GridSizeSelector extends Table{
                 gridSelect = (int) gridSizeSlider.getValue();
                 gridSize.setText(gridList.get(gridSelect));
 
-                if (GameData.getInstance().unlock.isUnlocked(screen.difficultySelector.getDifficulty(), getGridSize())){
+                if (GameData.getInstance().isUnlocked(screen.difficultySelector.getDifficulty(), getGridSize())){
                     gridSizeLock.setVisible(false);
                     gridSizeLock.remove();
                     screen.next.setVisible(true);
@@ -106,7 +106,7 @@ public class GridSizeSelector extends Table{
                             (screen.difficultySelector.getDifficulty().difficultyLevel + 1) * 500;
                     screen.purchaseWindow.getTitleLabel().setText("Unlock for " + price + " coins?");
                     screen.purchaseWindow.setObject(screen.purchaseWindow.yes, price);
-                    screen.purchaseWindow.show(screen.getStage());
+                    screen.purchaseWindow.show(screen.stage);
                 }
             }
         });

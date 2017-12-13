@@ -13,8 +13,6 @@ import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
-import com.lazybean.yaypipe.gameobjects.Snail;
-import com.lazybean.yaypipe.gameobjects.Wand;
 import com.lazybean.yaypipe.screens.GameScreen;
 
 public class ItemSelector extends Table{
@@ -44,7 +42,7 @@ public class ItemSelector extends Table{
         Image coin = new Image(assetLoader.coin);
         coin.setScaling(Scaling.fillX);
         Label.LabelStyle itemLabelStyle = new Label.LabelStyle(assetLoader.getFont(FontType.ANJA_SMALL), Color.BLACK);
-        Label snailLabel = new Label(String.valueOf(Snail.PRICE), itemLabelStyle);
+        Label snailLabel = new Label(String.valueOf(SnailEffect.PRICE), itemLabelStyle);
 
         Group snailIconGroup = new Group();
         snailIconGroup.setSize(YayPipe.SCREEN_HEIGHT * 0.08f, YayPipe.SCREEN_HEIGHT * 0.08f);
@@ -87,7 +85,7 @@ public class ItemSelector extends Table{
 
         Image coin2 = new Image(assetLoader.coin);
         coin2.setScaling(Scaling.fillX);
-        Label wandLabel = new Label(String.valueOf(Wand.PRICE), itemLabelStyle);
+        Label wandLabel = new Label(String.valueOf(WandDrawer.PRICE), itemLabelStyle);
 
         wandTable.add(wandIconGroup).colspan(2).row();
         wandTable.add(coin2).width(wandLabel.getHeight()).padRight(10);
@@ -106,17 +104,17 @@ public class ItemSelector extends Table{
     public void act(float delta) {
         if (wandIcon.isTouched()){
             wandIcon.setTouched(false);
-            if (wandStock < Wand.MAX_STOCK && GameData.getInstance().coinBank.getBalance() >= Wand.PRICE){
+            if (wandStock < WandDrawer.MAX_STOCK && GameData.getInstance().getCoin() >= WandDrawer.PRICE){
                 wandIcon.setDim(false);
                 wandStock++;
                 GameData.getInstance().setWandStock(wandStock);
-                GameData.getInstance().coinBank.addBalance(-Wand.PRICE);
+                GameData.getInstance().addCoin(-WandDrawer.PRICE);
 
                 wandStockBadge.setBadgeLabel("x" + String.valueOf(wandStock));
                 wandStockBadge.setVisible(true);
             }
-            else if (wandStock >= Wand.MAX_STOCK){
-                screen.addMessage("Don't be greedy!\nYou can only have " + Wand.MAX_STOCK + "!");
+            else if (wandStock >= WandDrawer.MAX_STOCK){
+                screen.addMessage("Don't be greedy!\nYou can only have " + WandDrawer.MAX_STOCK + "!");
             }
             else{
                 screen.addMessage("Not enough coins");
@@ -125,18 +123,18 @@ public class ItemSelector extends Table{
 
         if (snailIcon.isTouched()){
             snailIcon.setTouched(false);
-            if (snailStock < Snail.MAX_STOCK && GameData.getInstance().coinBank.getBalance() >= Snail.PRICE){
+            if (snailStock < SnailEffect.MAX_STOCK && GameData.getInstance().getCoin() >= SnailEffect.PRICE){
                 snailIcon.setDim(false);
                 snailStock++;
                 GameData.getInstance().setSnailStock(snailStock);
-                GameData.getInstance().coinBank.addBalance(-Snail.PRICE);
+                GameData.getInstance().addCoin(-SnailEffect.PRICE);
 
                 snailStockBadge.setBadgeLabel("x" + String.valueOf(snailStock));
                 snailStockBadge.setVisible(true);
             }
 
-            else if (snailStock >= Snail.MAX_STOCK){
-                screen.addMessage("Don't be greedy!\nYou can only have " + Snail.MAX_STOCK + "!");
+            else if (snailStock >= SnailEffect.MAX_STOCK){
+                screen.addMessage("Don't be greedy!\nYou can only have " + SnailEffect.MAX_STOCK + "!");
             }
 
             else{

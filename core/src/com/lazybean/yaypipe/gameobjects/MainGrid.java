@@ -302,9 +302,12 @@ public class MainGrid extends Group implements Disposable{
 
     @Override
     public void dispose() {
+        clearChildren();
         for (int i = 0; i < mainGridBlockArray.size; i++){
             for (int j = 0; j < mainGridBlockArray.get(i).size; j++){
-                assetLoader.blockFactory.free(mainGridBlockArray.get(i).get(j));
+                Block block = mainGridBlockArray.get(i).get(j);
+                block.clearChildren();
+                assetLoader.blockFactory.free(block);
             }
         }
     }

@@ -125,12 +125,13 @@ public class Gui {
 
     public void useWand(WandDrawer drawer, final WandBlock movingBlock){
         //decease stock by 1
-        gameWorld.wand.setStock(gameWorld.wand.getStock() - 1);
-        if (!gameWorld.wand.isAvailable()){
+        int wandStock = GameData.getInstance().getWandStock() - 1;
+        GameData.getInstance().setWandStock(wandStock);
+        if (wandStock == 0){
             itemTray.disableWand();
         }
         else {
-            itemTray.wandStock.setBadgeLabel("x" + String.valueOf(gameWorld.wand.getStock()));
+            itemTray.wandStock.setBadgeLabel("x" + String.valueOf(wandStock));
         }
 
         final NextBlock movingBlockClone = assetLoader.blockFactory.obtainNextBlock();

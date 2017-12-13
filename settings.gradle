@@ -1,2 +1,1 @@
-include 'desktop', 'android', 'core', ':googleplayservice'
-project(':googleplayservice').projectDir = new File('libs/googleplayservice')
+include 'desktop', 'android', 'core'

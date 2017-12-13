@@ -7,7 +7,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.FontType;
@@ -27,10 +28,9 @@ import com.lazybean.yaypipe.gui.PageScrollPane;
 import com.lazybean.yaypipe.gui.PurchaseWindow;
 import com.lazybean.yaypipe.gui.SetupUpperBarUI;
 
-import aurelienribon.tweenengine.TweenManager;
-
 public class GameSetupScreen extends GameScreen{
     private AssetLoader assetLoader;
+    public Stage stage;
     private Table table;
 
     private PageScrollPane pageScrollPane;
@@ -46,6 +46,7 @@ public class GameSetupScreen extends GameScreen{
         super(passedGame, YayPipe.BACKGROUND_COLOUR);
 
         assetLoader = game.assetLoader;
+        stage = new Stage(new ScreenViewport(), game.stage.getBatch());
 
         table = new Table();
         table.align(Align.center);
@@ -74,9 +75,10 @@ public class GameSetupScreen extends GameScreen{
             @Override
             protected void result(Object object) {
                 if (object instanceof Integer){
-                    if (GameData.getInstance().coinBank.getBalance() >= (int)object) {
-                        GameData.getInstance().coinBank.addBalance(-(Integer) object);
-                        GameData.getInstance().unlock.setUnlock(difficultySelector.getDifficulty(), gridSizeSelector.getGridSize(), true);
+                    if (GameData.getInstance().getCoin() >= (int)object) {
+                        GameData.getInstance().addCoin(-(Integer) object);
+                        upperBarUI.coinAnimator.setTargetNum(GameData.getInstance().getCoin());
+                        GameData.getInstance().setUnlock(difficultySelector.getDifficulty(), gridSizeSelector.getGridSize());
                         gridSizeSelector.getLock().setVisible(false);
                         gridSizeSelector.getLock().remove();
                         next.setVisible(true);
@@ -100,8 +102,8 @@ public class GameSetupScreen extends GameScreen{
         textButtonStyle.font = assetLoader.getFont(FontType.ANJA_MEDIUM);
         textButtonStyle.fontColor = Color.BLACK;
         textButtonStyle.up = assetLoader.button;
-        textButtonStyle.pressedOffsetY = -10;
-        textButtonStyle.pressedOffsetX = 10;
+        textButtonStyle.pressedOffsetY = -5;
+        textButtonStyle.pressedOffsetX = 5;
 
         Table navigateTable = new Table();
         next = new TextButton("NEXT", textButtonStyle);
@@ -113,6 +115,10 @@ public class GameSetupScreen extends GameScreen{
                 if (pageScrollPane.getScrollX() == pageScrollPane.getMaxX()){
                     next.setVisible(false);
                     start.setVisible(true);
+                }
+
+                if (gridSizeSelector.getLock().isVisible()){
+                    next.setVisible(false);
                 }
                 back.setVisible(true);
             }
@@ -160,7 +166,7 @@ public class GameSetupScreen extends GameScreen{
         pageScrollPane.firstPage();
         back.setVisible(false);
         next.setVisible(true);
-        start.setVisible(false);
+//        start.setVisible(false);
 
         itemSelector.update();
 

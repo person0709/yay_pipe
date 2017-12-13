@@ -16,13 +16,13 @@ import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.GameState;
-import com.lazybean.yaypipe.gamehelper.gamedata.CoinBank;
+import com.lazybean.yaypipe.gamehelper.NumberAnimator;
+import com.lazybean.yaypipe.gamehelper.Stopwatch;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
-import com.lazybean.yaypipe.gamehelper.gamedata.Statistics;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
 import com.lazybean.yaypipe.gameobjects.Coin;
 import com.lazybean.yaypipe.gamehelper.Score;
@@ -45,21 +45,21 @@ public class GameOverWindow extends GameWindow{
     private Icon retry_icon, quit_icon, view_icon;
 
     private Score score;
-    private CoinBank coinBank;
-
-    private boolean scoreUpdateStart = false;
 
     private Array<Coin> coinArray = new Array<>();
 
+    private NumberAnimator coinNumberAnimator;
     private TweenManager tweenManager;
 
     public GameOverWindow(AssetLoader assetLoader, final boolean isClear, GameWorld gameWorld) {
         super(assetLoader.uiSkin, gameWorld);
 
-        this.score = gameWorld.getScore();
-        this.coinBank = GameData.getInstance().coinBank;
-
-        this.tweenManager = new TweenManager();
+        score = gameWorld.getScore();
+        score.getNumberAnimator().setStartNum(0);
+        score.getNumberAnimator().stop();
+        tweenManager = new TweenManager();
+        coinNumberAnimator = new NumberAnimator();
+        coinNumberAnimator.setRange(GameData.getInstance().getCoin(), GameData.getInstance().getCoin());
 
         Color iconColor = CustomColor.INDIGO.getColor();
         Label.LabelStyle style = new Label.LabelStyle(assetLoader.getFont(FontType.ANJA_EXTRA_LARGE), Color.BLACK);
@@ -74,7 +74,7 @@ public class GameOverWindow extends GameWindow{
             getContentTable().add(label).padBottom(Value.percentHeight(0.2f)).colspan(2).row();
         }
 
-        Label clearTime = new Label(GameData.getInstance().statistics.convertSecondToMinute(GameData.getInstance().statistics.getStageTimeSum()), getSkin(), "gameOverTime");
+        Label clearTime = new Label(Stopwatch.convertSecondToMinute(Stopwatch.getInstance().getIntTime()), getSkin(), "gameOverTime");
 
         // TODO: 24/08/2016 time bonus
 //        Label timeBonus_label = new Label("TIME BONUS", detailStyle);
@@ -229,13 +229,12 @@ public class GameOverWindow extends GameWindow{
                 .push(Tween.to(crossPipeUse_value, SpriteAccessor.ALPHA, 0.3f).target(1f))
                 .push(Tween.to(line, SpriteAccessor.ALPHA, 0.3f).target(1f))
                 .push(Tween.to(finalScore_label, SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .push(Tween.to(finalScore_value, SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .setCallback(new TweenCallback() {
+                .push(Tween.to(finalScore_value, SpriteAccessor.ALPHA, 0.3f).target(1f).setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
-                        scoreUpdateStart = true;
+                        score.getNumberAnimator().start();
                     }
-                })
+                }))
                 .end()
                 .start(tweenManager);
 
@@ -254,6 +253,25 @@ public class GameOverWindow extends GameWindow{
             addActor(coinImage);
         }
 
+        if (coinArray.size > 0) {
+            int coinToAdd;
+
+            //1% of total score for coins when cleared
+            if (isClear) {
+                coinToAdd = (int) ((score.getTotalScore() * 0.01f));
+            }
+            //0.5% of total score for coins when failed
+            else {
+                coinToAdd = (int) ((score.getTotalScore() * 0.005f));
+            }
+
+            GameData.getInstance().addCoin(coinToAdd);
+            coinNumberAnimator.setTargetNum(coinNumberAnimator.getCurrentNum() + coinToAdd);
+            coinNumberAnimator.setChangeConstant(coinToAdd / coinArray.size);
+            coinNumberAnimator.setDelay(0.2f);
+        }
+
+
         // coin animation
         float timeDelay = 1f;
         for (int i = 0; i < coinArray.size; i++){
@@ -271,14 +289,7 @@ public class GameOverWindow extends GameWindow{
                     .setCallback(new TweenCallback() {
                         @Override
                         public void onEvent(int type, BaseTween<?> source) {
-                            //1% of total score when cleared
-                            if (isClear) {
-                                coinBank.addBalance((int) ((score.getTotalScore() * 0.01f) / coinArray.size));
-                            }
-                            //0.5% of total score when failed
-                            else{
-                                coinBank.addBalance((int) ((score.getTotalScore() * 0.005f) / coinArray.size));
-                            }
+                            coinNumberAnimator.start();
                         }
                     })
                     .delay(timeDelay)
@@ -287,7 +298,8 @@ public class GameOverWindow extends GameWindow{
             timeDelay+= 0.2f;
         }
 
-        if (score.getCurrentScore() > GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)){
+        //highscore event
+        if (score.getTotalScore() > GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)){
             Timeline.createSequence()
                     .push(Tween.to(container, SpriteAccessor.SCALE, 0.5f).target(0f).ease(Quart.IN)
                             .setCallback(new TweenCallback() {
@@ -316,23 +328,16 @@ public class GameOverWindow extends GameWindow{
     }
 
     @Override
-    public float getHeight() {
-        return getPrefHeight();
-    }
-
-    @Override
     public float getPrefWidth() {
         return YayPipe.SCREEN_WIDTH * 0.85f;
     }
 
     @Override
-    public float getPrefHeight() {
-        return YayPipe.SCREEN_HEIGHT * 0.75f;
-    }
-
-    @Override
     public void act(float delta) {
         super.act(delta);
+
+        score.update(delta);
+        coinNumberAnimator.update(delta);
 
         if (quit_icon.isTouched()){
             quit_icon.setTouched(false);
@@ -351,20 +356,16 @@ public class GameOverWindow extends GameWindow{
         finalScore_value.setText(String.valueOf(currentScore));
         finalScore_value.setAlignment(Align.center);
 
-        int coin = coinBank.getCurrentBalance();
-        coin_value.setText(String.valueOf(coin));
+        coin_value.setText(String.valueOf(coinNumberAnimator.getCurrentNum()));
         coin_value.setAlignment(Align.center);
 
         //skip score increasing animation
         if (Gdx.input.justTouched()) {
             tweenManager.update(100f);
+            coinNumberAnimator.skip();
             score.skip();
         }
 
-        if (scoreUpdateStart) {
-            score.update(5, true);
-        }
         tweenManager.update(delta);
-        coinBank.update(1);
     }
 }

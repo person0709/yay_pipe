@@ -16,28 +16,25 @@ public class Score
     private static final int STOP_PASS_ADDITION = 1000;
     private static final int FINISH_BONUS = 500;
 
+    private NumberAnimator numberAnimator;
+
     private int pipeConnectScore = 0;
     private int stopPassScore = 0;
     private int stopPassCount = 0;
     private int pipeChangeScore = 0;
 
     private int totalScore;
-    private int currentScore;
     private int undoScore;
     private ScoreType undoType;
 
     private int scoreChange = 0;
 
-    private int stepChange=1;
-
-    public Score(){
+    public Score(NumberAnimator numberAnimator){
         totalScore = 0;
-        currentScore = 0;
+        this.numberAnimator = numberAnimator;
     }
 
     public synchronized void addPoints(GridBlock block, ScoreType scoreType){
-        currentScore = totalScore;
-
         int points = 0;
 
         switch (scoreType){
@@ -75,10 +72,11 @@ public class Score
         undoScore = -points;
         totalScore += points;
         scoreChange = points;
+
+        numberAnimator.setTargetNum(totalScore);
     }
 
     public synchronized void undoScore() {
-        currentScore = totalScore;
         totalScore += undoScore;
 
         switch (undoType){
@@ -92,30 +90,12 @@ public class Score
         }
 
         scoreChange = undoScore;
+
+        numberAnimator.setTargetNum(totalScore);
     }
 
-    public synchronized void update(int step, boolean accelerate){
-        if (accelerate){
-            stepChange++;
-            step = step + stepChange;
-        }
-
-        if (currentScore < totalScore){
-            if (currentScore + step < totalScore){
-                currentScore += step;
-            }
-            else{
-                currentScore = totalScore;
-            }
-        }
-        if (currentScore > totalScore){
-            if (currentScore - step > totalScore) {
-                currentScore -= step;
-            }
-            else {
-                currentScore = totalScore;
-            }
-        }
+    public synchronized void update(float delta){
+        numberAnimator.update(delta);
     }
 
     public void applyMultiplier(){
@@ -123,7 +103,7 @@ public class Score
     }
 
     public synchronized int getCurrentScore(){
-        return currentScore;
+        return numberAnimator.getCurrentNum();
     }
 
     public int getTotalScore(){
@@ -142,15 +122,15 @@ public class Score
         return pipeChangeScore;
     }
 
-    public void reset(){
-        currentScore = 0;
-    }
-
     public void skip(){
-        currentScore = totalScore;
+        numberAnimator.skip();
     }
 
     public int getScoreChange(){
         return scoreChange;
+    }
+
+    public NumberAnimator getNumberAnimator(){
+        return numberAnimator;
     }
 }

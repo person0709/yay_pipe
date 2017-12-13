@@ -12,10 +12,6 @@ import static com.lazybean.yaypipe.gamehelper.StatisticsType.*;
 public class Statistics {
     private HashMap<String, Integer> hashMap;
 
-    private long totalStartTime;
-    private long stageTimeSum = 0;
-    private boolean isTimerOn = false;
-
     private int undoCount = 0;
     private int pipeChangeCount = 0;
     private int fullAllDirectionCount = 0;
@@ -37,63 +33,18 @@ public class Statistics {
         hashMap.put(statisticsType.name(), value);
     }
 
-    public String convertSecondToHour(int time){
-        String second = String.valueOf(time % 60);
-        if (second.length() == 1){
-            second = "0" + second;
-        }
-        String minute = String.valueOf((time / 60) % 60);
-        if (minute.length() == 1){
-            minute = "0" + minute;
-        }
-        String hour = String.valueOf(time / 3600);
-        if (hour.length() == 1){
-            hour = "0" + hour;
-        }
-
-        String string = String.valueOf(hour) + ":" + String.valueOf(minute) + ":" + String.valueOf(second);
-
-        return string;
-    }
-
-    public String convertSecondToMinute(int time){
-        String second = String.valueOf(time % 60);
-        if (second.length() == 1){
-            second = "0" + second;
-        }
-        String minute = String.valueOf((time / 60) % 60);
-
-        String string = String.valueOf(minute) + ":" + String.valueOf(second);
-
-        return string;
-    }
-
-    public void startTimer(){
-        totalStartTime = System.currentTimeMillis();
-        isTimerOn = true;
-    }
-
-    public void stopTimer(){
-        long timeSum = get(TOTAL_PLAYTIME);
-        timeSum += (System.currentTimeMillis() - totalStartTime)/1000;
-        put(TOTAL_PLAYTIME, (int) timeSum);
-
-        stageTimeSum += System.currentTimeMillis() - totalStartTime;
-        isTimerOn = false;
-    }
-
     public void reset(){
-        stageTimeSum = 0;
         undoCount = 0;
         pipeChangeCount = 0;
         fullAllDirectionCount = 0;
     }
 
-    public int getStageTimeSum(){
-        return (int) stageTimeSum/1000;
+    public void addPlayTime(float time) {
+        long timeSum = get(TOTAL_PLAYTIME);
+        put(TOTAL_PLAYTIME, (int)(timeSum + time));
     }
 
-    public void checkBestTime(Difficulty difficulty) {
+    public void checkBestTime(Difficulty difficulty, float time) {
         StatisticsType key;
         switch (difficulty) {
             case EASY:
@@ -120,27 +71,27 @@ public class Statistics {
                 return;
         }
 
-        if (get(key) > getStageTimeSum() || get(key) == 0) {
-            put(key, getStageTimeSum());
+        if (get(key) > time || get(key) == 0) {
+            put(key, Math.round(time));
         }
     }
 
     public void checkHighScore(Difficulty difficulty, int highScore) {
         //score achievement
         if (highScore >= 3000){
-            GameData.getInstance().unlock.setUnlock(Difficulty.NORMAL, true);
+            GameData.getInstance().setUnlock(Difficulty.NORMAL);
             YayPipe.playService.unlockAchievement(AchievementType.NOVICE_PLUMBER);
         }
         if (highScore >= 5000){
-            GameData.getInstance().unlock.setUnlock(Difficulty.HARD, true);
+            GameData.getInstance().setUnlock(Difficulty.HARD);
             YayPipe.playService.unlockAchievement(AchievementType.MEDIOCRE_PLUMBER);
         }
         if (highScore >= 10000){
-            GameData.getInstance().unlock.setUnlock(Difficulty.EXTREME, true);
+            GameData.getInstance().setUnlock(Difficulty.EXTREME);
             YayPipe.playService.unlockAchievement(AchievementType.PROFESSIONAL_PLUMBER);
         }
         if (highScore >= 25000){
-            GameData.getInstance().unlock.setUnlock(Difficulty.MASTER, true);
+            GameData.getInstance().setUnlock(Difficulty.MASTER);
             YayPipe.playService.unlockAchievement(AchievementType.EXPERT_PLUMBER);
         }
         if (highScore >= 50000){
@@ -180,10 +131,6 @@ public class Statistics {
                 put(HIGHSCORE_ALL, highScore);
             }
         }
-    }
-
-    public boolean isTimerOn(){
-        return isTimerOn;
     }
 
     public void incrementValue(StatisticsType key, int count) {
@@ -283,8 +230,9 @@ public class Statistics {
         incrementValue(PIPE_ALL_DIRECTION_USE, allDirectionCount);
         incrementValue(PIPE_ALL_DIRECTION_FULL_USE, fullAllDirectionCount);
 
-        YayPipe.playService.incrementAchievement(AchievementType.BE_WATER_MY_FRIEND, fullAllDirectionCount);
-
+        if (fullAllDirectionCount > 0) {
+            YayPipe.playService.incrementAchievement(AchievementType.BE_WATER_MY_FRIEND, fullAllDirectionCount);
+        }
 
         if (get(MOST_PIPE_CONNECTED) < totalPipeConnectCount) {
             put(MOST_PIPE_CONNECTED, totalPipeConnectCount);

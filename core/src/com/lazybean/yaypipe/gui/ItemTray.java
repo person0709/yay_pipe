@@ -16,6 +16,7 @@ import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.IconType;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 
 public class ItemTray extends Table {
     private GameWorld gameWorld;
@@ -47,7 +48,7 @@ public class ItemTray extends Table {
         snailIcon.setDiameter(YayPipe.SCREEN_WIDTH * 0.15f);
         snailIcon.setColor(CustomColor.RED.getColor());
 
-        snailStock = new Badge(assetLoader, "x" + String.valueOf(gameWorld.snail.getStock()));
+        snailStock = new Badge(assetLoader, "x" + String.valueOf(GameData.getInstance().getSnailStock()));
         snailStock.setPosition(snailGroup.getRight(),0, Align.bottomRight);
         snailStock.setColor(Color.BLACK);
 
@@ -62,7 +63,7 @@ public class ItemTray extends Table {
         wandIcon.setDiameter(YayPipe.SCREEN_WIDTH * 0.15f);
         wandIcon.setColor(CustomColor.RED.getColor());
 
-        wandStock = new Badge(assetLoader, "x" + String.valueOf(gameWorld.wand.getStock()));
+        wandStock = new Badge(assetLoader, "x" + String.valueOf(GameData.getInstance().getWandStock()));
         wandStock.setPosition(wandGroup.getRight(),0, Align.bottomRight);
         wandStock.setColor(Color.BLACK);
 
@@ -97,10 +98,10 @@ public class ItemTray extends Table {
             }
         });
 
-        if (!gameWorld.snail.isAvailable()) {
+        if (GameData.getInstance().getSnailStock() == 0) {
             disableSnail();
         }
-        if (!gameWorld.wand.isAvailable()) {
+        if (GameData.getInstance().getWandStock() == 0) {
             disableWand();
         }
     }
@@ -115,11 +116,11 @@ public class ItemTray extends Table {
         if (snailIcon.isTouched()){
             snailIcon.setTouched(false);
             snailEffect.activate();
-            if (!gameWorld.snail.isAvailable()){
+            if (GameData.getInstance().getSnailStock() == 0){
                 disableSnail();
             }
             else {
-                snailStock.setBadgeLabel("x" + String.valueOf(gameWorld.snail.getStock()));
+                snailStock.setBadgeLabel("x" + String.valueOf(GameData.getInstance().getSnailStock()));
             }
         }
         super.act(delta);

@@ -1,8 +1,9 @@
 package com.lazybean.yaypipe;
 
-import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
@@ -13,34 +14,37 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.games.SnapshotsClient;
+import com.google.android.gms.games.snapshot.Snapshot;
+import com.google.android.gms.games.snapshot.SnapshotMetadata;
+import com.google.android.gms.games.snapshot.SnapshotMetadataChange;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.example.games.basegameutils.GameHelper;
 import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AdHelper;
 import com.lazybean.yaypipe.gamehelper.PlayService;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.util.IabHelper;
 import com.lazybean.yaypipe.util.IabResult;
 import com.lazybean.yaypipe.util.Purchase;
 
+import java.io.IOException;
+
 public class AndroidLauncher extends AndroidApplication implements PlayService, AdHelper {
 	private GoogleSignInClient googleSignInClient;
-	private GoogleSignInAccount signedInAccount;
 	private SnapshotsClient snapshotsClient;
+	private Snapshot snapshot;
 
-	private GameHelper gameHelper;
-	private final static int requestCode = 1;
 	private IabHelper mHelper;
 
 
@@ -65,28 +69,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 
 		googleSignInClient = GoogleSignIn.getClient(this,
 				new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-				.requestScopes(Drive.SCOPE_APPFOLDER)
+						.requestScopes(Drive.SCOPE_APPFOLDER)
 						.requestEmail()
-				.build());
-
-		signedInAccount = null;
-		snapshotsClient = null;
-
-//		gameHelper = new GameHelper(this, GameHelper.CLIENT_GAMES);
-//		gameHelper.enableDebugLog(true);
-//
-//		GameHelper.GameHelperListener gameHelperListener = new GameHelper.GameHelperListener() {
-//			@Override
-//			public void onSignInFailed() {
-//				Gdx.app.log("MainActivity", "Log in failed");
-//			}
-//
-//			@Override
-//			public void onSignInSucceeded() {
-//				Gdx.app.log("MainActivity", "Log in succeeded ");
-//			}
-//		};
-//		gameHelper.setup(gameHelperListener);
+						.build());
 
 		//In-app payment settings
 		mHelper = new IabHelper(this, base64EncodedPublicKey);
@@ -124,19 +109,16 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	protected void onStart() {
 		super.onStart();
 		startSignInIntent();
-//		gameHelper.onStart(this);
 	}
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-//		gameHelper.onStop();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-//		signInSilently();
 	}
 
 	@Override
@@ -150,8 +132,6 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-//		gameHelper.onActivityResult(requestCode, requestCode, data);
-
 		if (requestCode == RC_SIGN_IN){
 			Task<GoogleSignInAccount> task =
 					GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -169,14 +149,23 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	}
 
 	private void onConnected(GoogleSignInAccount googleSignInAccount){
-		signedInAccount = googleSignInAccount;
-		snapshotsClient = Games.getSnapshotsClient(this, signedInAccount);
-		Toast.makeText(this, "Signed in as " + signedInAccount.getEmail(), Toast.LENGTH_SHORT).show();
+		getSnapshot(googleSignInAccount);
+		Games.getGamesClient(this, googleSignInAccount).setViewForPopups(graphics.getView());
+		Toast.makeText(this, "Signed in as " + googleSignInAccount.getEmail(), Toast.LENGTH_SHORT).show();
+	}
+
+	private void getSnapshot(GoogleSignInAccount googleSignInAccount){
+		snapshotsClient = Games.getSnapshotsClient(this, googleSignInAccount);
+		snapshotsClient.open("save", true).addOnSuccessListener(new OnSuccessListener<SnapshotsClient.DataOrConflict<Snapshot>>() {
+			@Override
+			public void onSuccess(SnapshotsClient.DataOrConflict<Snapshot> snapshotDataOrConflict) {
+				snapshot = snapshotDataOrConflict.getData();
+				Toast.makeText(AndroidLauncher.this, "Snapshot opened", Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 
 	private void onDisconnected(){
-		signedInAccount = null;
-		snapshotsClient = null;
 		Toast.makeText(this, "Signed out", Toast.LENGTH_SHORT).show();
 	}
 
@@ -185,43 +174,29 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 
 	@Override
 	public void startSignInIntent() {
-		startActivityForResult(googleSignInClient.getSignInIntent(), RC_SIGN_IN);
-		
-
-//		try
-//		{
-//			runOnUiThread(new Runnable()
-//			{
-//				@Override
-//				public void run()
-//				{
-//					gameHelper.beginUserInitiatedSignIn();
-//					Gdx.app.log("SignIn", "succeeded");
-//				}
-//			});
-//		}
-//		catch (Exception e)
-//		{
-//			Gdx.app.log("MainActivity", "Log in failed: " + e.getMessage() + ".");
-//		}
+		if (isConnectedToInternet()) {
+			startActivityForResult(googleSignInClient.getSignInIntent(), RC_SIGN_IN);
+		}
 	}
 
 	@Override
 	public void signInSilently() {
-		googleSignInClient.silentSignIn().addOnCompleteListener(this,
-				new OnCompleteListener<GoogleSignInAccount>() {
-					@Override
-					public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
-						if (task.isSuccessful()){
-							Gdx.app.log("Tag", "SilentSignInSuccessful");
+		if (isConnectedToInternet()) {
+			googleSignInClient.silentSignIn().addOnCompleteListener(this,
+					new OnCompleteListener<GoogleSignInAccount>() {
+						@Override
+						public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
+							if (task.isSuccessful()) {
+								Gdx.app.log("Tag", "SilentSignInSuccessful");
 
-							onConnected(task.getResult());
+								onConnected(task.getResult());
 
-						} else {
-							Gdx.app.log("Tag", "SilentSignInUnSuccessful");
+							} else {
+								Gdx.app.log("Tag", "SilentSignInUnSuccessful");
+							}
 						}
-					}
-				});
+					});
+		}
 	}
 
 	@Override
@@ -238,156 +213,91 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 						}
 					}
 				});
-
-
-//		try
-//		{
-//			runOnUiThread(new Runnable()
-//			{
-//				@Override
-//				public void run()
-//				{
-//					gameHelper.signOut();
-//					Gdx.app.log("SignOut", "succeeded");
-//				}
-//			});
-//		}
-//		catch (Exception e)
-//		{
-//			Gdx.app.log("MainActivity", "Log out failed: " + e.getMessage() + ".");
-//		}
 	}
 
 	@Override
 	public void unlockAchievement(AchievementType achievementType) {
 		if (isSignedIn()) {
+			GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
 			switch (achievementType) {
 				case WELCOME:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_welcome_to_yaypipe));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_welcome_to_yaypipe));
 					break;
 
 				case TOO_EASY:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_too_easy));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_too_easy));
 					break;
 
 				case START_PLUMBING:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_start_plumbing));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_start_plumbing));
 					break;
 
 				case NOT_HARD_ENOUGH:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_not_hard_enough));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_not_hard_enough));
 					break;
 
 				case PIPING_HOT:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_piping_hot));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_piping_hot));
 					break;
 
 				case MARIO_WILL_BE_PROUD:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_mario_will_be_proud));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_mario_will_be_proud));
 					break;
 
 				case NOVICE_PLUMBER:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_novice_plumber));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_novice_plumber));
 					break;
 
 				case MEDIOCRE_PLUMBER:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_mediocre_plumber));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_mediocre_plumber));
 					break;
 
 				case PROFESSIONAL_PLUMBER:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_professional_plumber));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_professional_plumber));
 					break;
 
 				case EXPERT_PLUMBER:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_expert_plumber));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_expert_plumber));
 					break;
 
 				case MASTER_PLUMBER:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_master_plumber));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_master_plumber));
 					break;
 
 				case COWARD:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_coward));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_coward));
 					break;
 
 				case THINGS_HAPPEN:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_things_happen));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_things_happen));
 					break;
 
 				case ON_FIRE:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_on_fire));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_on_fire));
 					break;
 
 				case VERY_RESOURCEFUL:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_very_resourceful));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_very_resourceful));
 					break;
 
 				case CAREFUL_PLANNER:
-					Games.getAchievementsClient(this, signedInAccount)
+					Games.getAchievementsClient(this, signInAccount)
 							.unlock(getString(R.string.achievement_careful_planner));
-
-//					Games.Achievements.unlock(gameHelper.getApiClient(),
-//							getString(R.string.achievement_careful_planner));
 					break;
 			}
 		}
@@ -396,25 +306,20 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	@Override
 	public void incrementAchievement(AchievementType achievementType, int count) {
 		if (isSignedIn()) {
+			GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
 			switch (achievementType) {
 				case SORE_FINGER:
-					Games.getAchievementsClient(this, signedInAccount).increment(getString(R.string.achievement_sore_finger), count);
-//					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_sore_finger), 1);
+					Games.getAchievementsClient(this, signInAccount).increment(getString(R.string.achievement_sore_finger), count);
 					break;
 
 				case BE_WATER_MY_FRIEND:
-					Games.getAchievementsClient(this, signedInAccount).increment(getString(R.string.achievement_be_water_my_friend), count);
-//					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_be_water_my_friend), 1);
+					Games.getAchievementsClient(this, signInAccount).increment(getString(R.string.achievement_be_water_my_friend), count);
 					break;
 
 				case PLAY_TIME:
-					Games.getAchievementsClient(this, signedInAccount).increment(getString(R.string.achievement_keep_calm_and_plumb_on), count);
-					Games.getAchievementsClient(this, signedInAccount).increment(getString(R.string.achievement_no_pain_no_flow), count);
-					Games.getAchievementsClient(this, signedInAccount).increment(getString(R.string.achievement_try_hard), count);
-
-//					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_keep_calm_and_plumb_on), 1);
-//					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_no_pain_no_flow), 1);
-//					Games.Achievements.increment(gameHelper.getApiClient(), getString(R.string.achievement_try_hard), 1);
+					Games.getAchievementsClient(this, signInAccount).increment(getString(R.string.achievement_keep_calm_and_plumb_on), count);
+					Games.getAchievementsClient(this, signInAccount).increment(getString(R.string.achievement_no_pain_no_flow), count);
+					Games.getAchievementsClient(this, signInAccount).increment(getString(R.string.achievement_try_hard), count);
 					break;
 			}
 		}
@@ -422,22 +327,20 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 
 	@Override
 	public void submitScore(int highScore) {
-		if (isSignedIn())
-		{
-			Games.Leaderboards.submitScore(gameHelper.getApiClient(),
-					getString(R.string.leaderboard_high_score), highScore);
+		if (isSignedIn()) {
+			GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
+			Games.getLeaderboardsClient(this, signInAccount)
+					.submitScore(getString(R.string.leaderboard_high_score), highScore);
 		}
-		else
-		{
+		else {
 			startSignInIntent();
 		}
 	}
 
 	@Override
 	public void showAchievement() {
-		if (isSignedIn())
-		{
-			Games.getAchievementsClient(this, signedInAccount)
+		if (isSignedIn()) {
+			Games.getAchievementsClient(this, GoogleSignIn.getLastSignedInAccount(this))
 					.getAchievementsIntent()
 					.addOnSuccessListener(new OnSuccessListener<Intent>() {
 						@Override
@@ -448,41 +351,70 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 
 //			startActivityForResult(Games.Achievements.getAchievementsIntent(gameHelper.getApiClient()), requestCode);
 		}
-		else
-		{
+		else {
 			startSignInIntent();
 		}
 	}
 
 	@Override
 	public void showLeaderBoards() {
-		if (isSignedIn())
-		{
-			startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(),
-					getString(R.string.leaderboard_high_score)), requestCode);
+		if (isSignedIn()) {
+			Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+					.getLeaderboardIntent(getString(R.string.leaderboard_high_score))
+					.addOnSuccessListener(new OnSuccessListener<Intent>() {
+						@Override
+						public void onSuccess(Intent intent) {
+							startActivityForResult(intent, RC_LEADERBOARD_HIGHSCORE_UI);
+						}
+					});
 		}
-		else
-		{
+		else {
 			startSignInIntent();
 		}
 	}
 
 	@Override
 	public boolean isSignedIn() {
-		return signedInAccount != null;
-//		return gameHelper.isSignedIn();
+		return GoogleSignIn.getLastSignedInAccount(this) != null;
 	}
 
+	@Override
+	public boolean isConnectedToInternet() {
+		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+		return networkInfo != null && networkInfo.isConnectedOrConnecting();
+	}
 
 	@Override
-	public void saveGame(String json) {
-		if (isSignedIn()){
+	public void saveToSnapshot(final String json) {
+		snapshot.getSnapshotContents().writeBytes(json.getBytes());
+
+		SnapshotMetadataChange metadataChange = new SnapshotMetadataChange.Builder().build();
+
+		snapshotsClient.commitAndClose(snapshot, metadataChange).addOnCompleteListener(new OnCompleteListener<SnapshotMetadata>() {
+			@Override
+			public void onComplete(@NonNull Task<SnapshotMetadata> task) {
+				if (task.isSuccessful()){
+					Toast.makeText(AndroidLauncher.this, "Save successful", Toast.LENGTH_SHORT).show();
+				} else{
+					Toast.makeText(AndroidLauncher.this, "Save unsuccessful", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+
+	}
+
+	@Override
+	public byte[] loadFromSnapshot() {
+		if (isSignedIn()) {
+			try {
+				return snapshot.getSnapshotContents().readFully();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-	}
-
-	@Override
-	public void loadGame() {
-
+		return null;
 	}
 
 

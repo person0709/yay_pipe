@@ -5,10 +5,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.ScreenManager;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
@@ -19,9 +21,12 @@ import aurelienribon.tweenengine.Tween;
 public class SplashScreen extends GameScreen{
     private AssetLoader assetLoader;
 
+    private Stage stage;
+
     public SplashScreen(YayPipe game){
         super(game, Color.BLACK);
         assetLoader = game.assetLoader;
+        stage = new Stage(new ScreenViewport(), game.stage.getBatch());
 
         Tween.registerAccessor(Actor.class, new SpriteAccessor());
         Tween.registerAccessor(Group.class, new SpriteAccessor());

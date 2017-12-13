@@ -3,30 +3,27 @@ package com.lazybean.yaypipe.gui;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.GameState;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
-import com.lazybean.yaypipe.gameobjects.Snail;
 
 import aurelienribon.tweenengine.BaseTween;
-import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenAccessor;
 import aurelienribon.tweenengine.TweenCallback;
-import aurelienribon.tweenengine.TweenEquation;
-import aurelienribon.tweenengine.TweenEquations;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Quad;
-import aurelienribon.tweenengine.equations.Quart;
 
 
 public class SnailEffect extends Actor {
+    public static final float WATER_SPEED = 5f;
+    public static final int MAX_STOCK = 1;
+    public static final int PRICE = 500;
+    public static final float ACTIVE_TIME = 5f;
+
     private GameWorld gameWorld;
 
     private boolean isActive = false;
@@ -57,7 +54,7 @@ public class SnailEffect extends Actor {
         //puts the effect behind the grid
         setZIndex(0);
 
-        gameWorld.snail.setStock(gameWorld.snail.getStock() - 1);
+        GameData.getInstance().setSnailStock(GameData.getInstance().getSnailStock() - 1);
 
         Tween.to(this, SpriteAccessor.SCALE, 1.5f).target(1f).ease(Quad.OUT).start(tweenManager);
     }
@@ -77,7 +74,7 @@ public class SnailEffect extends Actor {
     public void act(float delta) {
         tweenManager.update(delta);
         if (isActive && gameWorld.getState() == GameState.RUNNING){
-            if (timePassed > Snail.ACTIVE_TIME){
+            if (timePassed > ACTIVE_TIME){
                 deactivate();
                 isActive = false;
                 gameWorld.getGrid().getWater().setSnail(false);

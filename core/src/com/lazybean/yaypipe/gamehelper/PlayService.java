@@ -3,6 +3,7 @@ package com.lazybean.yaypipe.gamehelper;
 public interface PlayService {
     int RC_SIGN_IN = 9001;
     int RC_ACHIEVEMENT_UI = 9003;
+    int RC_LEADERBOARD_HIGHSCORE_UI = 9005;
 
 
     void startSignInIntent();
@@ -14,7 +15,8 @@ public interface PlayService {
     void showAchievement();
     void showLeaderBoards();
     boolean isSignedIn();
+    boolean isConnectedToInternet();
 
-    void saveGame(String json);
-    void loadGame();
+    void saveToSnapshot(String json);
+    byte[] loadFromSnapshot();
 }

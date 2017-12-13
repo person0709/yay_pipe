@@ -71,7 +71,7 @@ public class DifficultySelector extends Table{
                 difficulty.setText(difficultyList.get(difficultySelect));
                 screen.gridSizeSelector.setRange(getDifficulty());
 
-                if (GameData.getInstance().unlock.isUnlocked(getDifficulty())){
+                if (GameData.getInstance().isUnlocked(getDifficulty())){
                     difficultyLock.setVisible(false);
                     difficultyLock.remove();
                     screen.next.setVisible(true);

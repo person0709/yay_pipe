@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.Difficulty;
+import com.lazybean.yaypipe.gamehelper.Stopwatch;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.GameState;
 import com.lazybean.yaypipe.gamehelper.GridSize;
@@ -37,7 +38,8 @@ public class GamePlayScreen extends GameScreen {
             YayPipe.replayCount++;
         }
 
-        gameWorldStage = stage;
+        gameWorldStage = new Stage(new ScreenViewport());
+        gameWorldStage.addActor(Stopwatch.getInstance());
 
         guiStage = new Stage(new ScreenViewport(), gameWorldStage.getBatch());
 
@@ -80,8 +82,10 @@ public class GamePlayScreen extends GameScreen {
 
             if (gameWorld.isRestart()) {
                 GameData.getInstance().statistics.incrementValue(StatisticsType.TOTAL_RESTART, 1);
+                Stopwatch.getInstance().remove();
+                gameWorld.dispose();
+                gui.dispose();
                 game.setScreen(new GamePlayScreen(game, gameWorld.difficulty, gameWorld.gridSize));
-                dispose();
             }
             else {
                 game.setScreen(game.screenManager.getMainMenuScreen());
@@ -113,12 +117,10 @@ public class GamePlayScreen extends GameScreen {
 
     @Override
     public void dispose() {
-        super.dispose();
         Gdx.app.log("GamePlayScreen","disposed");
+        Stopwatch.getInstance().remove();
         gameWorld.dispose();
         gui.dispose();
-        if (GameData.getInstance().statistics.isTimerOn()){
-            GameData.getInstance().statistics.stopTimer();
-        }
+        super.dispose();
     }
 }

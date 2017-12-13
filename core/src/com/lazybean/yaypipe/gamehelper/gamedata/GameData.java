@@ -3,42 +3,54 @@ package com.lazybean.yaypipe.gamehelper.gamedata;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Json;
+import com.lazybean.yaypipe.YayPipe;
+import com.lazybean.yaypipe.gamehelper.Difficulty;
+import com.lazybean.yaypipe.gamehelper.GridSize;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameData {
-    public Unlock unlock;
-    public CoinBank coinBank;
+    private Map<String, Object> saveData;
     public Statistics statistics;
 
     private static final GameData instance = new GameData();
-
-    private Preferences preferences;
 
     public static GameData getInstance() {
         return instance;
     }
 
+    private Preferences preferences;
+
+    //Blank game data
     private GameData() {
         preferences = Gdx.app.getPreferences("YayPipe");
-        if (preferences.getBoolean("isFirstRun", true)){
-            unlock = new Unlock();
-            coinBank = new CoinBank();
-            statistics = new Statistics();
+    }
 
-            preferences.putBoolean("sound", true);
-            preferences.putFloat("soundVolume", 1f);
-            preferences.putBoolean("itemUnlocked", false);
-            preferences.putInteger("wandStock", 0);
-            preferences.putInteger("snailStock", 0);
-            preferences.putBoolean("isFirstRun", false);
-            preferences.flush();
-        }
-        else{
-            Json json = new Json();
-            unlock = json.fromJson(Unlock.class, preferences.getString("unlock"));
-            coinBank = json.fromJson(CoinBank.class, preferences.getString("coinBank"));
-            statistics = json.fromJson(Statistics.class, preferences.getString("statistics"));
+    /**
+     * set everything to initial values for a new game data
+     */
+    public void init(){
+        preferences.putBoolean("isFirstRun", false);
+
+        for (Difficulty difficulty : Difficulty.values()){
+            preferences.putBoolean(difficulty.name(), false);
+            for (GridSize gridSize : GridSize.values()){
+                preferences.putBoolean(difficulty.name() + gridSize.name(), false);
+            }
         }
 
+        preferences.putBoolean(Difficulty.EASY.name(), true);
+        preferences.putBoolean(Difficulty.EASY.name() + GridSize.TINY, true);
+
+        preferences.putInteger("coin", 0);
+        preferences.putInteger("wandStock", 0);
+        preferences.putInteger("snailStock", 0);
+        preferences.putBoolean("sound", true);
+        preferences.putFloat("soundVolume", 1f);
+        preferences.flush();
+
+        statistics = new Statistics();
     }
 
     public boolean isSoundOn(){
@@ -69,6 +81,7 @@ public class GameData {
 
     public void setWandStock(int wandStock) {
         preferences.putInteger("wandStock", wandStock);
+        preferences.flush();
     }
 
     public int getSnailStock(){
@@ -77,13 +90,118 @@ public class GameData {
 
     public void setSnailStock(int snailStock) {
         preferences.putInteger("snailStock", snailStock);
+        preferences.flush();
     }
 
-    public void saveData(){
+    public int getCoin(){
+        return preferences.getInteger("coin");
+    }
+
+    public void addCoin(int coin){
+        int balance = getCoin() + coin;
+        preferences.putInteger("coin", balance);
+        preferences.flush();
+    }
+
+    public void setUnlock(Difficulty difficulty, GridSize gridSize){
+        preferences.putBoolean(difficulty.name() + gridSize.name(), true);
+        preferences.flush();
+    }
+
+    public void setUnlock(Difficulty difficulty){
+        preferences.putBoolean(difficulty.name(), true);
+        preferences.flush();
+    }
+
+    public boolean isUnlocked(Difficulty difficulty, GridSize gridSize){
+        return preferences.getBoolean(difficulty.name() + gridSize.name());
+    }
+
+    public boolean isUnlocked(Difficulty difficulty){
+        return preferences.getBoolean(difficulty.name());
+    }
+
+    public void saveLocal(){
         Json json = new Json();
-        preferences.putString("unlock", json.toJson(unlock, Unlock.class));
-        preferences.putString("coinBank", json.toJson(coinBank, CoinBank.class));
         preferences.putString("statistics", json.toJson(statistics, Statistics.class));
+        preferences.flush();
+    }
+
+    public void saveLocalToCloud(){
+        if (YayPipe.playService.isConnectedToInternet()) {
+            Json json = new Json();
+            saveData.put("coin", preferences.getInteger("coin"));
+            saveData.put("wandStock", preferences.getInteger("wandStock"));
+            saveData.put("snailStock", preferences.getInteger("snailStock"));
+            saveData.put("statistics", preferences.getString("statistics"));
+
+            for (Difficulty difficulty : Difficulty.values()) {
+                String key = difficulty.name();
+                saveData.put(key, preferences.getBoolean(key));
+                for (GridSize gridSize : GridSize.values()) {
+                    String key2 = key + gridSize.name();
+                    saveData.put(key2, preferences.getBoolean(key2));
+                }
+            }
+
+            YayPipe.playService.saveToSnapshot(json.toJson(saveData));
+        }
+    }
+
+    public void loadData(){
+        // if connected to internet, try loading from cloud
+        if (YayPipe.playService.isConnectedToInternet()) {
+            Json json = new Json();
+            byte[] data = YayPipe.playService.loadFromSnapshot();
+            //when there is no cloud data
+            if (data == null || data.length == 0) {
+                loadFromLocal();
+            } else {
+                saveData = json.fromJson(HashMap.class, new String(data));
+
+                copyCloudToLocal();
+
+                statistics = json.fromJson(Statistics.class, preferences.getString("statistics"));
+            }
+        } else {
+            loadFromLocal();
+        }
+    }
+
+    private void loadFromLocal(){
+        Json json = new Json();
+        saveData = new HashMap<>();
+
+        // when it's first time running the app
+        if (preferences.getBoolean("isFirstRun", true)) {
+            init();
+        } else {
+            // load statistics from preference
+
+            String stat = preferences.getString("statistics");
+            if (stat.length() == 0) {
+                statistics = new Statistics();
+            } else {
+                statistics = json.fromJson(Statistics.class, preferences.getString("statistics"));
+            }
+        }
+    }
+
+    private void copyCloudToLocal(){
+        preferences.putInteger("coin", (Integer) saveData.get("coin"));
+        preferences.putInteger("wandStock", (Integer) saveData.get("wandStock"));
+        preferences.putInteger("snailStock", (Integer) saveData.get("snailStock"));
+        preferences.putString("statistics", (String) saveData.get("statistics"));
+
+        for (Difficulty difficulty : Difficulty.values()){
+            String key = difficulty.name();
+            preferences.putBoolean(key, (Boolean) saveData.get(key));
+            for (GridSize gridSize : GridSize.values()){
+                String key2 = key + gridSize.name();
+                preferences.putBoolean(key2, (Boolean) saveData.get(key2));
+            }
+        }
+
         preferences.flush();
     }
 }

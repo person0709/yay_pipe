@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -24,7 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
-import com.lazybean.yaypipe.gamehelper.AchievementType;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.SoundType;
@@ -46,6 +47,8 @@ import aurelienribon.tweenengine.equations.Sine;
 public class MainMenuScreen extends GameScreen{
     private AssetLoader assetLoader;
 
+    private Stage stage;
+
     private QuitWindow quitWindow;
 
     private Icon settings;
@@ -54,18 +57,27 @@ public class MainMenuScreen extends GameScreen{
     private Image y_1, a, y_2, ex_mark, p_1, i, p_2, e;
     private Vector2 dropStartPos;
     private Actor drop;
+    private Actor inPipeActor;
+    private Actor splashActor;
     private Animation<TextureRegion> inPipe, splash;
-    private float pipeAnimationStateTime = 0;
-    private float splashAnimationStateTime = 0;
-    private boolean isAnimationStart = false;
-    private boolean isDropFinished = false;
-    private boolean splashAnimationStart = false;
+    private float animStateTime = 0;
+
+    private boolean animPhaseOne = false; // water accumulating at the pipe
+    private boolean animPhaseTwo = false; // waterdrop falling
+    private boolean animPhaseThree = false; // waterdrop splashing
+
+    private TweenCallback animPhaseOneStart;
+    private TweenCallback animPhaseTwoStart;
+    private TweenCallback animPhaseThreeStart;
 
 //    private ShapeRenderer shapeRenderer = new ShapeRenderer();
 
     public MainMenuScreen(YayPipe passedGame) {
         super(passedGame, YayPipe.BACKGROUND_COLOUR);
+        GameData.getInstance().loadData();
+
         assetLoader = passedGame.assetLoader;
+        stage = new Stage(new ScreenViewport(), game.stage.getBatch());
 
         quitWindow = new QuitWindow(assetLoader);
 
@@ -186,13 +198,20 @@ public class MainMenuScreen extends GameScreen{
 //            }
 //        });
 
-        // TODO: 11/09/2016 purchase test
-        TextButton test = new TextButton("TEST", assetLoader.uiSkin, "mainMenu");
-        test.addListener(new ChangeListener() {
+        TextButton save = new TextButton("SAVE", assetLoader.uiSkin, "mainMenu");
+        save.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 //                YayPipe.adHelper.removeAds();
-                YayPipe.playService.unlockAchievement(AchievementType.WELCOME);
+                GameData.getInstance().saveLocalToCloud();
+            }
+        });
+
+        TextButton load = new TextButton("LOAD", assetLoader.uiSkin, "mainMenu");
+        load.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                GameData.getInstance().loadData();
             }
         });
 
@@ -211,8 +230,9 @@ public class MainMenuScreen extends GameScreen{
 //        table.row();
         table.add(achievement);
         table.row();
-        table.add(test).padBottom(Value.percentHeight(0.5f));
+        table.add(save);
         table.row();
+        table.add(load).padBottom(Value.percentHeight(0.5f)).row();
         table.add(highScoreLabel).height(YayPipe.SCREEN_HEIGHT * 0.2f);
 
         stage.addActor(table);
@@ -221,63 +241,89 @@ public class MainMenuScreen extends GameScreen{
 
         dropStartPos = new Vector2(pipe.getX() + pipe.getWidth() * 0.95f, pipe.getTop() - e.getImageHeight());
 
-        drop = new Actor(){
+        inPipeActor = new Actor(){
             @Override
             public void draw(Batch batch, float parentAlpha) {
-                Color color = new Color(batch.getColor());
-                batch.setColor(drop.getColor());
-                batch.draw(assetLoader.waterDrop, getX() - getWidth() / 2, getY() - getHeight(), getWidth(), getHeight());
-                batch.setColor(color);
-            }
-        };
-        drop.setSize(e.getImageHeight() * 0.4f, e.getImageHeight() * 0.4f);
-
-        Tween.set(drop, SpriteAccessor.ALPHA).target(0f).start(tweenManager);
-        stage.addActor(drop);
-
-
-        Actor inPipeActor = new Actor(){
-            @Override
-            public void act(float delta) {
-                if (isAnimationStart) {
-                    pipeAnimationStateTime += delta;
-                }
-            }
-
-            @Override
-            public void draw(Batch batch, float parentAlpha) {
-                if (isAnimationStart) {
-                    batch.draw(inPipe.getKeyFrame(pipeAnimationStateTime, false), getX(), getY(), getWidth(), getHeight());
+                if (animPhaseOne) {
+                    batch.draw(inPipe.getKeyFrame(animStateTime, false), getX(), getY(), getWidth(), getHeight());
                 }
             }
         };
         inPipeActor.setSize(e.getImageWidth() * 0.4f, e.getImageWidth() * 0.4f);
-        inPipeActor.setPosition(dropStartPos.x, dropStartPos.y, Align.top);
-
         stage.addActor(inPipeActor);
 
-        Actor splashActor = new Actor(){
-            @Override
-            public void act(float delta) {
-                if (isAnimationStart && splashAnimationStart) {
-                    splashAnimationStateTime += delta;
-                }
-            }
 
+        drop = new Actor(){
             @Override
             public void draw(Batch batch, float parentAlpha) {
-                if (isAnimationStart && splashAnimationStart)
-                    batch.draw(splash.getKeyFrame(splashAnimationStateTime, false),
+                Color batchColor = batch.getColor();
+                Color color = getColor();
+                batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
+                batch.draw(assetLoader.waterDrop, getX() - getWidth() / 2, getY() - getHeight(),getOriginX(), getOriginY(), getWidth(), getHeight(),
+                        getScaleX(), getScaleY(), getRotation());
+                batch.setColor(batchColor);
+            }
+        };
+        drop.setSize(e.getImageHeight() * 0.4f, e.getImageHeight() * 0.4f);
+        drop.setOrigin(Align.top);
+
+        stage.addActor(drop);
+
+
+        splashActor = new Actor(){
+            @Override
+            public void draw(Batch batch, float parentAlpha) {
+                if (animPhaseThree)
+                    batch.draw(splash.getKeyFrame(animStateTime, false),
                             getX(), getY(), getWidth(), getHeight());
             }
         };
         splashActor.setSize(e.getImageHeight() * 0.4f, e.getImageHeight() * 0.4f);
+
         splashActor.setPosition(dropStartPos.x, 0, Align.bottom);
+        inPipeActor.setPosition(dropStartPos.x, dropStartPos.y, Align.top);
 
         stage.addActor(splashActor);
 
-        inPipe = new Animation(0.7f / 9f, assetLoader.manager.get("pipe_drop_anim.atlas", TextureAtlas.class).findRegions("drop"));
-        splash = new Animation(0.05f, assetLoader.manager.get("splash_anim.atlas", TextureAtlas.class).findRegions("splash"));
+        inPipe = new Animation<>(0.7f / 9f, assetLoader.manager.get("pipe_drop_anim.atlas", TextureAtlas.class).findRegions("drop"));
+        splash = new Animation<>(0.05f, assetLoader.manager.get("splash_anim.atlas", TextureAtlas.class).findRegions("splash"));
+
+
+        animPhaseOneStart = new TweenCallback() {
+            @Override
+            public void onEvent(int type, BaseTween<?> source) {
+                Gdx.app.log("anim", "phaseOneStart");
+
+                animPhaseOne = true;
+                animStateTime = 0;
+            }
+        };
+
+        animPhaseTwoStart = new TweenCallback() {
+            @Override
+            public void onEvent(int type, BaseTween<?> source) {
+                Gdx.app.log("anim", "phaseTwoStart");
+
+                Timeline.createSequence()
+                        .push(Tween.set(drop, SpriteAccessor.POSITION).target(dropStartPos.x, dropStartPos.y - drop.getHeight() * 0.15f))
+                        .push(Tween.to(drop, SpriteAccessor.SCALE, 0.1f).target(1f))
+                        .push(Tween.to(drop, SpriteAccessor.POSITION, 1f).target(dropStartPos.x, 0).ease(Sine.IN))
+                        .push(Tween.set(drop, SpriteAccessor.SCALE).target(0f))
+                        .setCallback(animPhaseThreeStart).setCallbackTriggers(TweenCallback.END).start(tweenManager);
+            }
+        };
+
+        animPhaseThreeStart = new TweenCallback() {
+            @Override
+            public void onEvent(int type, BaseTween<?> source) {
+                Gdx.app.log("anim", "phaseThreeStart");
+
+                animPhaseThree = true;
+                animStateTime = 0;
+                assetLoader.getSound(SoundType.WATER_DROP).play(GameData.getInstance().getSoundVolume());
+            }
+        };
+
     }
 
     public void show() {
@@ -299,6 +345,7 @@ public class MainMenuScreen extends GameScreen{
         titleArray.addAll(y_1, a, y_2, ex_mark, p_1, i, p_2, e);
         titleArray.shuffle();
 
+
         Timeline.createParallel()
                 .push(Tween.to(titleArray.get(0), SpriteAccessor.SCALE, 0.25f).target(1f).ease(Back.OUT).delay(0.05f))
                 .push(Tween.to(titleArray.get(1), SpriteAccessor.SCALE, 0.25f).target(1f).ease(Back.OUT).delay(0.1f))
@@ -310,19 +357,14 @@ public class MainMenuScreen extends GameScreen{
                 .push(Tween.to(titleArray.get(7), SpriteAccessor.SCALE, 0.25f).target(1f).ease(Back.OUT).delay(0.4f))
                 .beginSequence()
                 .pushPause(0.8f)
-                .push(Tween.call(new TweenCallback() {
-                    @Override
-                    public void onEvent(int type, BaseTween<?> source) {
-                        isAnimationStart = true;
-                    }
-                }))
+                .push(Tween.call(animPhaseOneStart))
+                .pushPause(0.35f)
+                .push(Tween.call(animPhaseTwoStart))
                 .start(tweenManager);
 
         int highScore = GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL);
         highScoreLabel.setText("High Score\n" + String.valueOf(highScore));
     }
-
-    private boolean firstLoop = true;
 
     @Override
     public void render(float delta) {
@@ -331,36 +373,21 @@ public class MainMenuScreen extends GameScreen{
         stage.act(delta);
         stage.draw();
 
-        if(isAnimationStart) {
-            if (firstLoop) {
+        if(animPhaseOne) {
+            animStateTime += delta;
+            if (inPipe.isAnimationFinished(animStateTime)) {
+                animPhaseOne = false;
+            }
+        } else if (animPhaseThree){
+            animStateTime += delta;
+            if (splash.isAnimationFinished(animStateTime)){
+                animPhaseThree = false;
                 Timeline.createSequence()
-                        .pushPause(0.45f)
-                        .push(Tween.set(drop, SpriteAccessor.POSITION).target(dropStartPos.x, dropStartPos.y))
-                        .push(Tween.to(drop, SpriteAccessor.ALPHA, 0.1f).target(1f))
-                        .push(Tween.to(drop, SpriteAccessor.POSITION, 1f).target(dropStartPos.x, 0).ease(Sine.IN))
-                        .push(Tween.set(drop, SpriteAccessor.ALPHA).target(0f))
-                        .repeat(Tween.INFINITY,0f).setCallback(new TweenCallback() {
-                    @Override
-                    public void onEvent(int type, BaseTween<?> source) {
-                        splashAnimationStart = true;
-                        isDropFinished = true;
-                        assetLoader.getSound(SoundType.WATER_DROP).play(GameData.getInstance().getSoundVolume());
-                    }
-                }).setCallbackTriggers(TweenCallback.END)
+                        .push(Tween.call(animPhaseOneStart))
+                        .pushPause(0.35f)
+                        .push(Tween.call(animPhaseTwoStart))
                         .start(tweenManager);
-                firstLoop = false;
-            }
 
-            if (inPipe.isAnimationFinished(pipeAnimationStateTime)){
-                if (isDropFinished){
-                    isDropFinished = false;
-                    pipeAnimationStateTime = 0;
-                }
-            }
-
-            if (splash.isAnimationFinished(splashAnimationStateTime)){
-                splashAnimationStart = false;
-                splashAnimationStateTime = 0;
             }
         }
 
@@ -394,5 +421,12 @@ public class MainMenuScreen extends GameScreen{
         i.setScale(0f);
         p_2.setScale(0f);
         e.setScale(0f);
+        drop.setScale(0f);
+        tweenManager.killAll();
+
+        animStateTime = 0;
+        animPhaseOne = false;
+        animPhaseTwo = false;
+        animPhaseThree = false;
     }
 }

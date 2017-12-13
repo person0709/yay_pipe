@@ -86,6 +86,7 @@ public class GamePlayUpperBarUI extends UpperBarUI {
     @Override
     public void act(float delta) {
         super.act(delta);
+        score.update(delta);
         int currentScore = score.getCurrentScore();
         scoreNum.setText(String.valueOf(currentScore));
         if (currentScore > GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)) {

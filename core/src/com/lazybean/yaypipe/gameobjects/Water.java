@@ -7,17 +7,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.Difficulty;
 import com.lazybean.yaypipe.gamehelper.Direction;
-import com.lazybean.yaypipe.gamehelper.GridSize;
 import com.lazybean.yaypipe.gamehelper.PathLoader;
-
-import aurelienribon.tweenengine.BaseTween;
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenCallback;
+import com.lazybean.yaypipe.gui.SnailEffect;
 
 public class Water extends Actor {
     private final Color WATER_COLOR = CustomColor.TURQUOISE.getColor();
@@ -159,7 +154,7 @@ public class Water extends Actor {
         this.isSnailActive = snail;
 
         if (isSnailActive){
-            setVelocity(Snail.WATER_SPEED);
+            setVelocity(SnailEffect.WATER_SPEED);
         }
     }
 
@@ -224,7 +219,7 @@ public class Water extends Actor {
             setVelocity(velocity.len() + difficulty.waterSpeedIncrease);
         }
 
-        Gdx.app.log("currentSpeed", String.valueOf(velocity.len()));
+//        Gdx.app.log("currentSpeed", String.valueOf(velocity.len()));
     }
 
     @Override

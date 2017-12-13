@@ -27,6 +27,9 @@ import aurelienribon.tweenengine.TweenManager;
 
 
 public class WandDrawer extends Group implements Disposable {
+    public static final int MAX_STOCK = 5;
+    public static final int PRICE = 100;
+
     private GameWorld gameWorld;
     private AssetLoader assetLoader;
 

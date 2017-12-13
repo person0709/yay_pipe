@@ -19,9 +19,9 @@ allprojects {
     version = '1.0'
     ext {
         appName = "YayPipe"
-        gdxVersion = '1.9.7'
+        gdxVersion = '1.9.8'
         ashleyVersion = '1.7.0'
-        gsmLibraryVersion = '11.6.0'
+        gsmLibraryVersion = '11.6.2'
         appcompatLibraryVersion = '27.0.0'
     }
 
@@ -32,10 +32,10 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
 
-    tasks.withType(JavaCompile) {
-        sourceCompatibility = "1.7"
-        targetCompatibility = "1.7"
-    }
+//    tasks.withType(JavaCompile) {
+//        sourceCompatibility = "1.7"
+//        targetCompatibility = "1.7"
+//    }
 }
 
 project(":desktop") {
@@ -58,7 +58,6 @@ project(":android") {
 
     dependencies {
         compile project(":core")
-        compile project(":googleplayservice")
         compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
@@ -78,19 +77,8 @@ project(":android") {
         compile "com.google.android.gms:play-services-base:$gsmLibraryVersion"
         compile "com.google.android.gms:play-services-auth:$gsmLibraryVersion"
         compile "com.google.android.gms:play-services-ads:$gsmLibraryVersion"
-        compile 'com.google.firebase:firebase-core:11.6.0'
+        compile 'com.google.firebase:firebase-core:11.6.2'
         compile 'com.android.support:multidex:1.0.2'
-    }
-}
-
-project (":googleplayservice"){
-    apply plugin: 'com.android.library'
-
-    dependencies {
-        compile "com.android.support:appcompat-v7:${appcompatLibraryVersion}"
-        compile "com.android.support:support-v4:${appcompatLibraryVersion}"
-        compile "com.google.android.gms:play-services-games:${gsmLibraryVersion}"
-        compile "com.google.android.gms:play-services-plus:${gsmLibraryVersion}"
     }
 }
 

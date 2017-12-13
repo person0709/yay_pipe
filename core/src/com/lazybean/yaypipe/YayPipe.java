@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -97,15 +96,17 @@ public class YayPipe extends Game {
 
     @Override
     public void pause() {
+        Gdx.app.log("Game","paused");
+
+        GameData.getInstance().saveLocal();
         super.pause();
-        GameData.getInstance().saveData();
     }
 
     public void dispose(){
         Gdx.app.log("Game","disposed");
         assetLoader.dispose();
         PathLoader.dispose();
-        GameData.getInstance().saveData();
+        GameData.getInstance().saveLocal();
         super.dispose();
     }
 }

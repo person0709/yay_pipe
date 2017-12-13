@@ -14,8 +14,10 @@ import com.badlogic.gdx.utils.Align;
 import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.Difficulty;
+import com.lazybean.yaypipe.gamehelper.NumberAnimator;
 import com.lazybean.yaypipe.gamehelper.PipeType;
 import com.lazybean.yaypipe.gamehelper.SoundType;
+import com.lazybean.yaypipe.gamehelper.Stopwatch;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.GameState;
 import com.lazybean.yaypipe.gamehelper.GridSize;
@@ -27,8 +29,6 @@ import com.lazybean.yaypipe.gui.FinishIndicator;
 import com.lazybean.yaypipe.gui.Gui;
 import com.lazybean.yaypipe.gameobjects.MainGrid;
 import com.lazybean.yaypipe.gamehelper.Score;
-import com.lazybean.yaypipe.gameobjects.Snail;
-import com.lazybean.yaypipe.gameobjects.Wand;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;
@@ -54,9 +54,6 @@ public class GameWorld {
     private Vector2 undoBlockPos;
     private PipeType undoBlockPipeType;
 
-    public Snail snail;
-    public Wand wand;
-
     private Stage gameWorldStage;
     private boolean isPanning = false;
 
@@ -71,11 +68,9 @@ public class GameWorld {
 
         this.tweenManager = new TweenManager();
 
-        score = new Score();
-
-        wand = new Wand(GameData.getInstance().getWandStock());
-        snail = new Snail(GameData.getInstance().getSnailStock());
-
+        NumberAnimator numberAnimator = new NumberAnimator(0,0,2,0f, 0);
+        score = new Score(numberAnimator);
+        numberAnimator.start();
 
         mainGridInit();
 
@@ -123,7 +118,7 @@ public class GameWorld {
     public void update(float delta) {
         gameWorldStage.act();
         tweenManager.update(delta);
-        score.update(2, false);
+        score.update(delta);
 
         switch (state){
             case RUNNING:
@@ -152,7 +147,7 @@ public class GameWorld {
     public void start(){
         //start timer for stat recording
         GameData.getInstance().statistics.reset();
-        GameData.getInstance().statistics.startTimer();
+        Stopwatch.getInstance().start();
 
         //stop pass badge pop out animation
         float delay = 0.1f;
@@ -220,9 +215,6 @@ public class GameWorld {
 
         gui.showGameOverWindow(true);
 
-        //reset score counter to 0
-        score.reset();
-
         //apply bonus multiplier for full cross pipe uses
         score.applyMultiplier();
 
@@ -236,8 +228,8 @@ public class GameWorld {
         //high score/best time check for statistics
         Statistics statistics = GameData.getInstance().statistics;
         statistics.checkHighScore(difficulty, score.getTotalScore());
-        statistics.stopTimer();
-        statistics.checkBestTime(difficulty);
+        Stopwatch.getInstance().stop();
+        statistics.checkBestTime(difficulty, Stopwatch.getInstance().getFloatTime());
         statistics.incrementClear(difficulty);
         statistics.incrementValue(StatisticsType.TOTAL_TRY, 1);
         statistics.countPipeUse(grid.getGridBlockArray());
@@ -274,14 +266,12 @@ public class GameWorld {
         }
 
         Statistics statistics = GameData.getInstance().statistics;
-        statistics.stopTimer();
+        Stopwatch.getInstance().stop();
+        statistics.addPlayTime(Stopwatch.getInstance().getFloatTime());
         statistics.incrementValue(StatisticsType.TOTAL_FAIL, 1);
         statistics.incrementValue(StatisticsType.TOTAL_TRY, 1);
 
         gui.showGameOverWindow(false);
-
-        //reset score counter to 0
-        score.reset();
 
         setState(GameState.IDLE);
     }
@@ -290,7 +280,7 @@ public class GameWorld {
     public void pause(){
         state = GameState.PAUSED;
         grid.getWater().stop();
-        GameData.getInstance().statistics.stopTimer();
+        Stopwatch.getInstance().stop();
 
         gui.showPausedWindow();
     }
@@ -298,7 +288,7 @@ public class GameWorld {
     public void resume(){
         state = GameState.RUNNING;
         grid.getWater().resume();
-        GameData.getInstance().statistics.startTimer();
+        Stopwatch.getInstance().stop();
     }
 
     public void addPoints(GridBlock block, Score.ScoreType scoreType){
@@ -420,9 +410,7 @@ public class GameWorld {
 
     public void dispose() {
         Gdx.app.log("GameWorld","disposed");
-        GameData.getInstance().setSnailStock(snail.getStock());
-        GameData.getInstance().setWandStock(wand.getStock());
-        GameData.getInstance().saveData();
+        GameData.getInstance().saveLocal();
         grid.dispose();
         tweenManager.killAll();
     }
