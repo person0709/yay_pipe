@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.gamehelper.AdHelper;
+import com.lazybean.yaypipe.gamehelper.AndroidHelper;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.ScreenManager;
@@ -19,7 +20,6 @@ import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.PathLoader;
 import com.lazybean.yaypipe.gamehelper.PlayService;
 import com.lazybean.yaypipe.gui.Background;
-import com.lazybean.yaypipe.screens.SplashScreen;
 
 import aurelienribon.tweenengine.Tween;
 
@@ -36,15 +36,17 @@ public class YayPipe extends Game {
     public AssetLoader assetLoader;
     public static PlayService playService;
     public static AdHelper adHelper;
+    public static AndroidHelper androidHelper;
 
     public Stage stage;
-    private Background fadeInOut;
+    public Background fadeInOut;
 
     public ScreenManager screenManager;
 
-    public YayPipe(PlayService playService, AdHelper adHelper) {
-        YayPipe.playService = playService;
-        YayPipe.adHelper = adHelper;
+    public YayPipe(Object launcher) {
+        YayPipe.playService = (PlayService) launcher;
+        YayPipe.adHelper = (AdHelper) launcher;
+        YayPipe.androidHelper = (AndroidHelper) launcher;
     }
 
     @Override
@@ -70,7 +72,9 @@ public class YayPipe extends Game {
         PathLoader.load();
         assetLoader.manager.load("splash_logo.png", Texture.class);
         assetLoader.manager.finishLoading();
-        this.setScreen(new SplashScreen(this));
+
+        screenManager = new ScreenManager(this);
+        this.setScreenWithFadeInOut(screenManager.getSplashScreen());
 	}
 
 	@Override
@@ -80,14 +84,14 @@ public class YayPipe extends Game {
         stage.draw();
 	}
 
-    @Override
-    public void setScreen(final Screen screen) {
+    public void setScreenWithFadeInOut(final Screen screen) {
+        Gdx.input.setInputProcessor(null);
         fadeInOut.addAction(Actions.sequence(
                 Actions.alpha(1, 0.5f),
                 Actions.run(new Runnable() {
                     @Override
                     public void run() {
-                        YayPipe.super.setScreen(screen);
+                        setScreen(screen);
                     }
                 }),
                 Actions.alpha(0, 0.5f)
@@ -97,7 +101,6 @@ public class YayPipe extends Game {
     @Override
     public void pause() {
         Gdx.app.log("Game","paused");
-
         GameData.getInstance().saveLocal();
         super.pause();
     }

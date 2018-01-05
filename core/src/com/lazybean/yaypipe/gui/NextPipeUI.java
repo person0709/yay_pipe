@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -15,6 +16,7 @@ import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
+import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.PipeType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gameobjects.GridBlock;
@@ -35,7 +37,6 @@ public class NextPipeUI extends Group {
 
     private AssetLoader assetLoader;
     private GameWorld gameWorld;
-    private Gui gui;
 
     public Array<NextBlock> blockOrderQueue;
     private Array<PipeType> nextPipeList;
@@ -48,7 +49,6 @@ public class NextPipeUI extends Group {
 
     public NextPipeUI(GameWorld gameWorld, AssetLoader assetLoader){
         this.gameWorld = gameWorld;
-        this.gui = gameWorld.getGui();
         this.assetLoader = assetLoader;
         tweenManager = new TweenManager();
 
@@ -64,9 +64,13 @@ public class NextPipeUI extends Group {
 
         addActor(background);
 
+        Label.LabelStyle labelStyle = new Label.LabelStyle(assetLoader.getFont(FontType.ANJA_SMALL), Color.BLACK);
+        Label label = new Label("next", labelStyle);
         redBlock = new RedBlock(assetLoader.redBlock);
         redBlock.setPosition(getWidth() * 0.1f, getHeight() / 2, Align.center);
+        label.setPosition(redBlock.getX() + redBlock.getWidth() / 2, redBlock.getTop(), Align.bottom);
         addActor(redBlock);
+        addActor(label);
 
         nextPipeList = new Array<>();
         switch (gameWorld.difficulty) {

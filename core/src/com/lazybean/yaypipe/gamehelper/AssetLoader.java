@@ -157,6 +157,7 @@ public final class AssetLoader {
         uiSkin = new Skin();
 
         TextButton.TextButtonStyle menuButtonStyle = new TextButton.TextButtonStyle();
+        menuButtonStyle.up = button;
         menuButtonStyle.font = getFont(FontType.ANJA_MEDIUM);
         menuButtonStyle.fontColor = Color.BLACK;
         menuButtonStyle.pressedOffsetY = -10;

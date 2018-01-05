@@ -95,7 +95,7 @@ public class SetupUpperBarUI extends UpperBarUI {
 
         if (backIcon.isTouched()){
             backIcon.setTouched(false);
-            game.setScreen(game.screenManager.getMainMenuScreen());
+            game.setScreenWithFadeInOut(game.screenManager.getMainMenuScreen());
         }
     }
 }

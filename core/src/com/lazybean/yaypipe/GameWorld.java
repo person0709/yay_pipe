@@ -74,7 +74,7 @@ public class GameWorld {
 
         mainGridInit();
 
-        returnToPresetView();
+        returnToDefaultView();
 
         gameWorldStage.addListener(new ActorGestureListener(){
             private Vector2 gridPos = new Vector2();
@@ -403,7 +403,7 @@ public class GameWorld {
         return isPanning;
     }
 
-    public void returnToPresetView(){
+    public void returnToDefaultView(){
         grid.setPosition(YayPipe.SCREEN_WIDTH / 2, YayPipe.SCREEN_HEIGHT / 2, Align.center);
         ((OrthographicCamera)gameWorldStage.getCamera()).zoom = grid.getWidth() / YayPipe.SCREEN_WIDTH * 1.2f;
     }

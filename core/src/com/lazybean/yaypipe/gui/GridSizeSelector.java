@@ -102,11 +102,11 @@ public class GridSizeSelector extends Table{
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if (gridSizeLock.isVisible()) {
-                    int price = (screen.difficultySelector.getDifficulty().difficultyLevel) * (getGridSize().gridSizeLevel) * 1000 +
-                            (screen.difficultySelector.getDifficulty().difficultyLevel + 1) * 500;
-                    screen.purchaseWindow.getTitleLabel().setText("Unlock for " + price + " coins?");
-                    screen.purchaseWindow.setObject(screen.purchaseWindow.yes, price);
-                    screen.purchaseWindow.show(screen.stage);
+                    int price = (screen.difficultySelector.getDifficulty().difficultyLevel - 1) * 1000 +
+                            (getGridSize().gridSizeLevel) * 500;
+                    screen.promptWindow.getTitleLabel().setText("Unlock for " + price + " coins?");
+                    screen.promptWindow.setObject(screen.promptWindow.yes, price);
+                    screen.promptWindow.show(screen.stage);
                 }
             }
         });

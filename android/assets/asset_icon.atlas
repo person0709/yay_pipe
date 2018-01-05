@@ -6,105 +6,105 @@ filter: Nearest,Linear
 repeat: none
 badgeArrow
   rotate: false
-  xy: 410, 2
+  xy: 920, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 cross
   rotate: false
-  xy: 920, 2
+  xy: 1430, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 fastForward
   rotate: false
-  xy: 1022, 2
+  xy: 1634, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 googlePlay
   rotate: false
-  xy: 1328, 2
+  xy: 2, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 home
   rotate: false
-  xy: 2, 2
+  xy: 410, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 item
   rotate: false
-  xy: 1430, 2
+  xy: 104, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 lock
   rotate: false
-  xy: 716, 2
+  xy: 1124, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pause
   rotate: false
-  xy: 308, 2
+  xy: 818, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 restart
   rotate: false
-  xy: 1124, 2
+  xy: 1736, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 resume
   rotate: false
-  xy: 818, 2
+  xy: 1328, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 settings
   rotate: false
-  xy: 206, 2
+  xy: 716, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 share
   rotate: false
-  xy: 1634, 2
+  xy: 1226, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 snail
   rotate: false
-  xy: 512, 2
+  xy: 206, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 sound
   rotate: false
-  xy: 1736, 2
+  xy: 614, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 soundOff
   rotate: false
-  xy: 104, 2
+  xy: 512, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
@@ -118,21 +118,21 @@ undo
   index: -1
 wand
   rotate: false
-  xy: 1226, 2
+  xy: 1838, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 zoomIn
   rotate: false
-  xy: 1838, 2
+  xy: 308, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 zoomOut
   rotate: false
-  xy: 614, 2
+  xy: 1022, 2
   size: 100, 100
   orig: 100, 100
   offset: 0, 0

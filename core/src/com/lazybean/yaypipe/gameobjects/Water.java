@@ -216,7 +216,7 @@ public class Water extends Actor {
         // speed increase every interval
         if (timeCount > SPEED_INCREASE_INTERVAL && velocity.len() < difficulty.waterSpeedLimit && !isSnailActive){
             timeCount = 0;
-            setVelocity(velocity.len() + difficulty.waterSpeedIncrease);
+            setVelocity(velocity.len() + difficulty.difficultyLevel);
         }
 
 //        Gdx.app.log("currentSpeed", String.valueOf(velocity.len()));

@@ -122,12 +122,17 @@ public class GameData {
     }
 
     public void saveLocal(){
+        if (statistics == null){
+            return;
+        }
         Json json = new Json();
         preferences.putString("statistics", json.toJson(statistics, Statistics.class));
         preferences.flush();
     }
 
     public void saveLocalToCloud(){
+        YayPipe.androidHelper.showProgressBar();
+
         if (YayPipe.playService.isConnectedToInternet()) {
             Json json = new Json();
             saveData.put("coin", preferences.getInteger("coin"));
@@ -148,27 +153,32 @@ public class GameData {
         }
     }
 
-    public void loadData(){
+    public int loadFromCloud(){
         // if connected to internet, try loading from cloud
         if (YayPipe.playService.isConnectedToInternet()) {
             Json json = new Json();
             byte[] data = YayPipe.playService.loadFromSnapshot();
-            //when there is no cloud data
+            //when there is no cloud data, abort
             if (data == null || data.length == 0) {
-                loadFromLocal();
-            } else {
+                return -1;
+            }
+            // when there is cloud data,
+            else {
                 saveData = json.fromJson(HashMap.class, new String(data));
 
                 copyCloudToLocal();
 
                 statistics = json.fromJson(Statistics.class, preferences.getString("statistics"));
+                return 0;
             }
-        } else {
-            loadFromLocal();
+        }
+        //when not connected to internet
+        else {
+            return -2;
         }
     }
 
-    private void loadFromLocal(){
+    public void loadFromLocal(){
         Json json = new Json();
         saveData = new HashMap<>();
 

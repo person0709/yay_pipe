@@ -3,6 +3,7 @@ package com.lazybean.yaypipe.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
@@ -16,6 +17,8 @@ import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
 import com.lazybean.yaypipe.gui.Gui;
 
+import aurelienribon.tweenengine.Timeline;
+
 public class GamePlayScreen extends GameScreen {
     private AssetLoader assetLoader;
 
@@ -24,6 +27,8 @@ public class GamePlayScreen extends GameScreen {
 
     private Stage gameWorldStage;
     private Stage guiStage;
+
+    private InputMultiplexer multiplexer;
 
     public GamePlayScreen(YayPipe game, Difficulty gridSize, GridSize difficulty) {
         super(game, YayPipe.BACKGROUND_COLOUR);
@@ -43,8 +48,7 @@ public class GamePlayScreen extends GameScreen {
 
         guiStage = new Stage(new ScreenViewport(), gameWorldStage.getBatch());
 
-        InputMultiplexer im = new InputMultiplexer(guiStage, gameWorldStage);
-        Gdx.input.setInputProcessor(im);
+        multiplexer = new InputMultiplexer(guiStage, gameWorldStage);
 
         gameWorld = new GameWorld(gameWorldStage, assetLoader, difficulty, gridSize);
         gui = new Gui(guiStage, gameWorld, assetLoader);
@@ -54,10 +58,9 @@ public class GamePlayScreen extends GameScreen {
     }
 
 
-
     @Override
     public void show() {
-        
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
@@ -82,14 +85,30 @@ public class GamePlayScreen extends GameScreen {
 
             if (gameWorld.isRestart()) {
                 GameData.getInstance().statistics.incrementValue(StatisticsType.TOTAL_RESTART, 1);
-                Stopwatch.getInstance().remove();
-                gameWorld.dispose();
-                gui.dispose();
-                game.setScreen(new GamePlayScreen(game, gameWorld.difficulty, gameWorld.gridSize));
+                game.fadeInOut.addAction(Actions.sequence(
+                        Actions.alpha(1, 0.5f),
+                        Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                dispose();
+                                game.setScreen(new GamePlayScreen(game, gameWorld.difficulty, gameWorld.gridSize));
+                            }
+                        }),
+                        Actions.alpha(0, 0.5f)
+                ));
             }
             else {
-                game.setScreen(game.screenManager.getMainMenuScreen());
-                dispose();
+                game.fadeInOut.addAction(Actions.sequence(
+                        Actions.alpha(1, 0.5f),
+                        Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                dispose();
+                                game.setScreen(game.screenManager.getMainMenuScreen());
+                            }
+                        }),
+                        Actions.alpha(0, 0.5f)
+                ));
             }
 
             gameWorld.setState(GameState.IDLE);

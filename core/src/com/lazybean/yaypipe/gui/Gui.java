@@ -1,18 +1,12 @@
 package com.lazybean.yaypipe.gui;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Align;
 import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
-import com.lazybean.yaypipe.gamehelper.GameState;
-import com.lazybean.yaypipe.gamehelper.SoundType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gameobjects.NextBlock;
 import com.lazybean.yaypipe.gameobjects.WandBlock;
@@ -22,8 +16,6 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Elastic;
-import aurelienribon.tweenengine.equations.Quart;
 
 public class Gui {
     private GameWorld gameWorld;
@@ -105,7 +97,7 @@ public class Gui {
         if (itemTray != null){
             itemTray.remove();
         }
-        gameWorld.returnToPresetView();
+        gameWorld.returnToDefaultView();
         gameOverWindow.show(guiStage);
     }
 

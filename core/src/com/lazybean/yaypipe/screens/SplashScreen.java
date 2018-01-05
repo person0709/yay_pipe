@@ -12,9 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.ScreenManager;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.YayPipe;
+import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 
 import aurelienribon.tweenengine.Tween;
 
@@ -31,10 +31,7 @@ public class SplashScreen extends GameScreen{
         Tween.registerAccessor(Actor.class, new SpriteAccessor());
         Tween.registerAccessor(Group.class, new SpriteAccessor());
         Tween.registerAccessor(Sprite.class, new SpriteAccessor());
-    }
 
-    @Override
-    public void show() {
         Texture texture = assetLoader.manager.get("splash_logo.png");
         Image logo = new Image(texture);
 
@@ -48,14 +45,20 @@ public class SplashScreen extends GameScreen{
         assetLoader.manager.finishLoading();
         assetLoader.assignAssets();
 
+        YayPipe.playService.startSignInIntent();
+    }
+
+    @Override
+    public void show() {
+        YayPipe.androidHelper.hideProgressBar();
         stage.addAction(Actions.delay(3, Actions.run(new Runnable() {
             @Override
             public void run() {
-                game.screenManager = new ScreenManager(game);
-                game.setScreen(game.screenManager.getMainMenuScreen());
+                GameData.getInstance().loadFromLocal();
+                game.screenManager.getGameSetUpScreen();
+                game.setScreenWithFadeInOut(game.screenManager.getMainMenuScreen());
             }
         })));
-
 
     }
 

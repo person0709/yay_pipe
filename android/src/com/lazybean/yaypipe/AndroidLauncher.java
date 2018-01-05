@@ -6,6 +6,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.badlogic.gdx.Gdx;
@@ -32,6 +38,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.lazybean.yaypipe.gamehelper.AchievementType;
 import com.lazybean.yaypipe.gamehelper.AdHelper;
+import com.lazybean.yaypipe.gamehelper.AndroidHelper;
 import com.lazybean.yaypipe.gamehelper.PlayService;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.util.IabHelper;
@@ -40,10 +47,14 @@ import com.lazybean.yaypipe.util.Purchase;
 
 import java.io.IOException;
 
-public class AndroidLauncher extends AndroidApplication implements PlayService, AdHelper {
+public class AndroidLauncher extends AndroidApplication implements PlayService, AdHelper, AndroidHelper {
+	private RelativeLayout layout;
+
 	private GoogleSignInClient googleSignInClient;
 	private SnapshotsClient snapshotsClient;
 	private Snapshot snapshot;
+
+	private ProgressBar progressBar;
 
 	private IabHelper mHelper;
 
@@ -102,13 +113,41 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 		});
 		loadAd();
 
-		initialize(new YayPipe(this, this), config);
+		View gameView = initializeForView(new YayPipe(this), config);
+
+		layout = new RelativeLayout(this);
+		layout.addView(gameView);
+
+		progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyle);
+		progressBar.setIndeterminate(true);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.CENTER_IN_PARENT);
+		progressBar.setVisibility(View.VISIBLE);
+		layout.addView(progressBar, params);
+
+		setContentView(layout);
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-		startSignInIntent();
+	public void showProgressBar() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				progressBar.setVisibility(View.VISIBLE);
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+			}
+		});
+	}
+
+	@Override
+	public void hideProgressBar() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				progressBar.setVisibility(View.GONE);
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+			}
+		});
 	}
 
 	@Override
@@ -150,17 +189,19 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 
 	private void onConnected(GoogleSignInAccount googleSignInAccount){
 		getSnapshot(googleSignInAccount);
-		Games.getGamesClient(this, googleSignInAccount).setViewForPopups(graphics.getView());
+		Games.getGamesClient(this, googleSignInAccount).setViewForPopups(layout);
 		Toast.makeText(this, "Signed in as " + googleSignInAccount.getEmail(), Toast.LENGTH_SHORT).show();
 	}
 
 	private void getSnapshot(GoogleSignInAccount googleSignInAccount){
 		snapshotsClient = Games.getSnapshotsClient(this, googleSignInAccount);
-		snapshotsClient.open("save", true).addOnSuccessListener(new OnSuccessListener<SnapshotsClient.DataOrConflict<Snapshot>>() {
+		snapshotsClient.open("save", true).addOnCompleteListener(new OnCompleteListener<SnapshotsClient.DataOrConflict<Snapshot>>() {
 			@Override
-			public void onSuccess(SnapshotsClient.DataOrConflict<Snapshot> snapshotDataOrConflict) {
-				snapshot = snapshotDataOrConflict.getData();
-				Toast.makeText(AndroidLauncher.this, "Snapshot opened", Toast.LENGTH_SHORT).show();
+			public void onComplete(@NonNull Task<SnapshotsClient.DataOrConflict<Snapshot>> task) {
+				if (task.isSuccessful()){
+					snapshot = task.getResult().getData();
+				}
+				hideProgressBar();
 			}
 		});
 	}
@@ -176,6 +217,8 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	public void startSignInIntent() {
 		if (isConnectedToInternet()) {
 			startActivityForResult(googleSignInClient.getSignInIntent(), RC_SIGN_IN);
+		} else {
+			Toast.makeText(this, "Offline mode", Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -397,8 +440,10 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 			public void onComplete(@NonNull Task<SnapshotMetadata> task) {
 				if (task.isSuccessful()){
 					Toast.makeText(AndroidLauncher.this, "Save successful", Toast.LENGTH_SHORT).show();
+					getSnapshot(GoogleSignIn.getLastSignedInAccount(AndroidLauncher.this));
 				} else{
 					Toast.makeText(AndroidLauncher.this, "Save unsuccessful", Toast.LENGTH_SHORT).show();
+					hideProgressBar();
 				}
 			}
 		});

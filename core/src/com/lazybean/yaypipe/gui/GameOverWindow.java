@@ -238,15 +238,16 @@ public class GameOverWindow extends GameWindow{
                 .end()
                 .start(tweenManager);
 
-        validate();
-        //generate coins for piggy bank animation
-        Vector2 score_stageLoc = finalScore_value.localToStageCoordinates(new Vector2());
+        pack();
 
-        Vector2 piggy_stageLoc = piggy.localToStageCoordinates(new Vector2());
+        //generate coins for piggy bank animation
+        Vector2 scoreLoc = finalScore_value.localToStageCoordinates(new Vector2());
+
+        Vector2 piggyLoc = piggy.localToStageCoordinates(new Vector2());
 
         for (int i = 0; i < score.getTotalScore() / 200; i++){
             Coin coinImage = new Coin(assetLoader);
-            coinImage.setPosition(score_stageLoc.x - finalScore_value.getWidth(), score_stageLoc.y);
+            coinImage.setPosition(scoreLoc.x + finalScore_value.getWidth() / 2, scoreLoc.y);
             Tween.set(coinImage, SpriteAccessor.ALPHA).target(0f).start(tweenManager);
             coinArray.add(coinImage);
 
@@ -280,7 +281,7 @@ public class GameOverWindow extends GameWindow{
                     .delay(3f)
                     .push(Tween.to(temp, SpriteAccessor.ALPHA, 0.2f).target(1f))
                     .push(Tween.to(temp, SpriteAccessor.POSITION, 1f)
-                            .target(piggy_stageLoc.x + piggy.getWidth() / 2 - temp.getWidth()/2, piggy_stageLoc.y + piggy.getHeight() * 0.6f)
+                            .target(piggyLoc.x + piggy.getWidth() / 2 - temp.getWidth()/2, piggyLoc.y + piggy.getHeight() * 0.6f)
                             .ease(Sine.INOUT))
                     .beginSequence()
                     .pushPause(0.8f)

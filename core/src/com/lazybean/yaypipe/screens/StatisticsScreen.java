@@ -397,7 +397,7 @@ public class StatisticsScreen implements Screen {
                         @Override
                         public void onEvent(int type, BaseTween<?> source) {
                             dispose();
-                            game.setScreen(new MainMenuScreen(game));
+                            game.setScreenWithFadeInOut(new MainMenuScreen(game));
                         }
                     })
                     .start(tweenManager);

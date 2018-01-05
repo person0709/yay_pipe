@@ -74,14 +74,13 @@ public class MainMenuScreen extends GameScreen{
 
     public MainMenuScreen(YayPipe passedGame) {
         super(passedGame, YayPipe.BACKGROUND_COLOUR);
-        GameData.getInstance().loadData();
 
         assetLoader = passedGame.assetLoader;
         stage = new Stage(new ScreenViewport(), game.stage.getBatch());
 
         quitWindow = new QuitWindow(assetLoader);
 
-        final GameSettingWindow settingWindow = new GameSettingWindow(assetLoader);
+        final GameSettingWindow settingWindow = new GameSettingWindow(game, stage);
 
         settings = new Icon(assetLoader, IconType.SETTINGS, Icon.MENU_DIAMETER);
         settings.setColor(Color.BLACK);
@@ -169,17 +168,19 @@ public class MainMenuScreen extends GameScreen{
 
 
         TextButton newGame = new TextButton("NEW GAME", assetLoader.uiSkin, "mainMenu");
+        newGame.pad(Value.percentHeight(0.1f));
         newGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("NewGame", "Touched");
                 assetLoader.getSound(SoundType.CLICK).play(GameData.getInstance().getSoundVolume());
-                game.setScreen(game.screenManager.getGameSetUpScreen());
+                game.setScreenWithFadeInOut(game.screenManager.getGameSetUpScreen());
 
             }
         });
 
         TextButton achievement = new TextButton("ACHIEVEMENT", assetLoader.uiSkin, "mainMenu");
+        achievement.pad(Value.percentHeight(0.1f));
         achievement.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -194,46 +195,27 @@ public class MainMenuScreen extends GameScreen{
 //            public void changed(ChangeEvent event, Actor actor) {
 //                assetLoader.click.play(AssetLoader.prefs.getFloat("soundVolume"));
 //                dispose();
-//                game.setScreen(new StatisticsScreen(game, assetLoader));
+//                game.setScreenWithFadeInOut(new StatisticsScreen(game, assetLoader));
 //            }
 //        });
 
-        TextButton save = new TextButton("SAVE", assetLoader.uiSkin, "mainMenu");
-        save.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-//                YayPipe.adHelper.removeAds();
-                GameData.getInstance().saveLocalToCloud();
-            }
-        });
-
-        TextButton load = new TextButton("LOAD", assetLoader.uiSkin, "mainMenu");
-        load.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                GameData.getInstance().loadData();
-            }
-        });
-
         highScoreLabel = new Label("", assetLoader.uiSkin, "mainMenuHighScore");
-        highScoreLabel.setAlignment(Align.top);
+        highScoreLabel.setAlignment(Align.center);
 
         Table table = new Table();
         table.setFillParent(true);
         table.add(yay).size(yay.getWidth(), yay.getHeight()).padTop(YayPipe.SCREEN_HEIGHT * 0.2f).align(Align.center);
         table.row();
-        table.add(pipe).size(YayPipe.SCREEN_WIDTH * 0.6f, e.getImageHeight()).padTop(yay.getHeight() * 0.5f).align(Align.top).expandY();
+        table.add(pipe).size(YayPipe.SCREEN_WIDTH * 0.6f, e.getImageHeight()).padTop(yay.getHeight() * 0.5f).align(Align.top);
         table.row();
-        table.add(newGame).padTop(YayPipe.SCREEN_HEIGHT * 0.1f);
+        table.add(newGame).padTop(YayPipe.SCREEN_HEIGHT * 0.1f).padBottom(Value.percentHeight(0.1f));
         table.row();
 //        table.add(statistics);
 //        table.row();
-        table.add(achievement);
-        table.row();
-        table.add(save);
-        table.row();
-        table.add(load).padBottom(Value.percentHeight(0.5f)).row();
-        table.add(highScoreLabel).height(YayPipe.SCREEN_HEIGHT * 0.2f);
+        table.add(achievement).row();
+        table.add(highScoreLabel).align(Align.bottom).padBottom(YayPipe.SCREEN_HEIGHT * 0.1f).expandY();
+
+//        table.debug();
 
         stage.addActor(table);
 
@@ -292,7 +274,7 @@ public class MainMenuScreen extends GameScreen{
         animPhaseOneStart = new TweenCallback() {
             @Override
             public void onEvent(int type, BaseTween<?> source) {
-                Gdx.app.log("anim", "phaseOneStart");
+//                Gdx.app.log("anim", "phaseOneStart");
 
                 animPhaseOne = true;
                 animStateTime = 0;
@@ -302,7 +284,7 @@ public class MainMenuScreen extends GameScreen{
         animPhaseTwoStart = new TweenCallback() {
             @Override
             public void onEvent(int type, BaseTween<?> source) {
-                Gdx.app.log("anim", "phaseTwoStart");
+//                Gdx.app.log("anim", "phaseTwoStart");
 
                 Timeline.createSequence()
                         .push(Tween.set(drop, SpriteAccessor.POSITION).target(dropStartPos.x, dropStartPos.y - drop.getHeight() * 0.15f))
@@ -316,7 +298,7 @@ public class MainMenuScreen extends GameScreen{
         animPhaseThreeStart = new TweenCallback() {
             @Override
             public void onEvent(int type, BaseTween<?> source) {
-                Gdx.app.log("anim", "phaseThreeStart");
+//                Gdx.app.log("anim", "phaseThreeStart");
 
                 animPhaseThree = true;
                 animStateTime = 0;

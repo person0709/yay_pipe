@@ -19,13 +19,14 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
+import com.lazybean.yaypipe.gamehelper.Difficulty;
 import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gui.DifficultySelector;
 import com.lazybean.yaypipe.gui.GridSizeSelector;
 import com.lazybean.yaypipe.gui.ItemSelector;
 import com.lazybean.yaypipe.gui.PageScrollPane;
-import com.lazybean.yaypipe.gui.PurchaseWindow;
+import com.lazybean.yaypipe.gui.PromptWindow;
 import com.lazybean.yaypipe.gui.SetupUpperBarUI;
 
 public class GameSetupScreen extends GameScreen{
@@ -40,7 +41,9 @@ public class GameSetupScreen extends GameScreen{
 
     public TextButton next, back, start;
 
-    public PurchaseWindow purchaseWindow;
+    public PromptWindow promptWindow;
+
+    private InputMultiplexer multiplexer;
 
     public GameSetupScreen(YayPipe passedGame){
         super(passedGame, YayPipe.BACKGROUND_COLOUR);
@@ -71,7 +74,7 @@ public class GameSetupScreen extends GameScreen{
         pageScrollPane.addPage(itemSelector);
 
         Window.WindowStyle windowStyle = new Window.WindowStyle(assetLoader.getFont(FontType.NOTO_MEDIUM_LARGE), Color.BLACK, assetLoader.window);
-        purchaseWindow = new PurchaseWindow(assetLoader, windowStyle){
+        promptWindow = new PromptWindow(assetLoader, windowStyle){
             @Override
             protected void result(Object object) {
                 if (object instanceof Integer){
@@ -146,11 +149,11 @@ public class GameSetupScreen extends GameScreen{
 
 
         start = new TextButton("START!", textButtonStyle);
-        start.pad(Value.percentWidth(0.1f));
+        start.pad(start.getWidth() * 0.1f);
         start.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new GamePlayScreen(game, difficultySelector.getDifficulty(), gridSizeSelector.getGridSize()));
+                game.setScreenWithFadeInOut(new GamePlayScreen(game, difficultySelector.getDifficulty(), gridSizeSelector.getGridSize()));
             }
         });
 
@@ -158,30 +161,34 @@ public class GameSetupScreen extends GameScreen{
 
         table.add(start);
 
-    }
 
-    @Override
-    public void show() {
-        // reset page scroll pane to the first page
-        pageScrollPane.firstPage();
-        back.setVisible(false);
-        next.setVisible(true);
-//        start.setVisible(false);
-
-        itemSelector.update();
-
-        Gdx.input.setCatchBackKey(true);
         InputProcessor inputProcessor = new InputAdapter(){
             @Override
             public boolean keyUp(int keycode) {
                 if (keycode == Input.Keys.BACK){
-                    game.setScreen(new MainMenuScreen(game));
+                    game.setScreenWithFadeInOut(game.screenManager.getMainMenuScreen());
                 }
                 return true;
             }
         };
 
-        InputMultiplexer multiplexer = new InputMultiplexer(stage, inputProcessor);
+        multiplexer = new InputMultiplexer(stage, inputProcessor);
+    }
+
+    @Override
+    public void show() {
+        GameData.getInstance().setUnlock(Difficulty.HARD);
+
+        Gdx.input.setCatchBackKey(true);
+
+        // reset page scroll pane to the first page
+        pageScrollPane.firstPage();
+        back.setVisible(false);
+        next.setVisible(true);
+        start.setVisible(false);
+
+        itemSelector.update();
+
         Gdx.input.setInputProcessor(multiplexer);
     }
 

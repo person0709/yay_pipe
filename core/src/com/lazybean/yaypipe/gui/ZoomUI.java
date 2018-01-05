@@ -1,6 +1,5 @@
 package com.lazybean.yaypipe.gui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -45,7 +44,7 @@ public class ZoomUI extends Table {
 
         if (zoomOutIcon.isTouched()){
             zoomOutIcon.setTouched(false);
-            gameWorld.returnToPresetView();
+            gameWorld.returnToDefaultView();
         }
     }
 //
