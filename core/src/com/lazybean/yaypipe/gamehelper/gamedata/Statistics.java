@@ -59,8 +59,8 @@ public class Statistics {
                 key = BEST_TIME_HARD;
                 break;
 
-            case EXTREME:
-                key = BEST_TIME_EXTREME;
+            case PROFESSIONAL:
+                key = BEST_TIME_PRO;
                 break;
 
             case MASTER:
@@ -87,7 +87,7 @@ public class Statistics {
             YayPipe.playService.unlockAchievement(AchievementType.MEDIOCRE_PLUMBER);
         }
         if (highScore >= 10000){
-            GameData.getInstance().setUnlock(Difficulty.EXTREME);
+            GameData.getInstance().setUnlock(Difficulty.PROFESSIONAL);
             YayPipe.playService.unlockAchievement(AchievementType.PROFESSIONAL_PLUMBER);
         }
         if (highScore >= 25000){
@@ -112,8 +112,8 @@ public class Statistics {
                 key = HIGHSCORE_HARD;
                 break;
 
-            case EXTREME:
-                key = HIGHSCORE_EXTREME;
+            case PROFESSIONAL:
+                key = HIGHSCORE_PRO;
                 break;
 
             case MASTER:
@@ -156,9 +156,9 @@ public class Statistics {
                 incrementValue(CLEAR_HARD, 1);
                 break;
 
-            case EXTREME:
+            case PROFESSIONAL:
                 YayPipe.playService.unlockAchievement(AchievementType.PIPING_HOT);
-                incrementValue(CLEAR_EXTREME, 1);
+                incrementValue(CLEAR_PRO, 1);
                 break;
 
             case MASTER:

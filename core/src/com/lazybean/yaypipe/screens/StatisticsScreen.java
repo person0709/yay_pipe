@@ -114,7 +114,7 @@ public class StatisticsScreen implements Screen {
         Label hardClear_value = new Label(String.valueOf(statistics.get(StatisticsType.CLEAR_HARD)), labelStyle);
 
         Label proClear_label = new Label("Professional", labelStyle);
-        Label proClear_value = new Label(String.valueOf(statistics.get(StatisticsType.CLEAR_EXTREME)), labelStyle);
+        Label proClear_value = new Label(String.valueOf(statistics.get(StatisticsType.CLEAR_PRO)), labelStyle);
 
         Label masterClear_label = new Label("Master", labelStyle);
         Label masterClear_value = new Label(String.valueOf(statistics.get(StatisticsType.CLEAR_MASTER)), labelStyle);
@@ -132,7 +132,7 @@ public class StatisticsScreen implements Screen {
         Label hardHigh_value = new Label(String.valueOf(statistics.get(StatisticsType.HIGHSCORE_HARD)), labelStyle);
 
         Label proHigh_label = new Label("Professional", labelStyle);
-        Label proHigh_value = new Label(String.valueOf(statistics.get(StatisticsType.HIGHSCORE_EXTREME)), labelStyle);
+        Label proHigh_value = new Label(String.valueOf(statistics.get(StatisticsType.HIGHSCORE_PRO)), labelStyle);
 
         Label masterHigh_label = new Label("Master", labelStyle);
         Label masterHigh_value = new Label(String.valueOf(statistics.get(StatisticsType.HIGHSCORE_MASTER)), labelStyle);
@@ -171,7 +171,7 @@ public class StatisticsScreen implements Screen {
         }
 
         Label proTime_label = new Label("Extreme", labelStyle);
-        value = statistics.get(StatisticsType.BEST_TIME_EXTREME);
+        value = statistics.get(StatisticsType.BEST_TIME_PRO);
         Label proTime_value;
         if (value == 0){
             proTime_value = new Label("N/A", labelStyle);

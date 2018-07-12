@@ -41,7 +41,12 @@ public class GameData {
         }
 
         preferences.putBoolean(Difficulty.EASY.name(), true);
-        preferences.putBoolean(Difficulty.EASY.name() + GridSize.TINY, true);
+        preferences.putBoolean(Difficulty.EASY.name() + GridSize.TINY.name(), true);
+        preferences.putBoolean(Difficulty.NORMAL.name() + GridSize.SMALL.name(), true);
+        preferences.putBoolean(Difficulty.HARD.name() + GridSize.REGULAR.name(), true);
+        preferences.putBoolean(Difficulty.PROFESSIONAL.name() + GridSize.REGULAR.name(), true);
+        preferences.putBoolean(Difficulty.MASTER.name() + GridSize.LARGE.name(), true);
+
 
         preferences.putInteger("coin", 0);
         preferences.putInteger("wandStock", 0);

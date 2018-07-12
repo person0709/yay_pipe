@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "197469231763-r0h5f5gg8n9ru591c76goqq9u84coh4t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lazybean.yaypipe",
+            "certificate_hash": "a6349cc415c1b8d956c661551941f7a428caf7a5"
+          }
+        },
+        {
           "client_id": "197469231763-ie6smphmduhtus2biehjugflj4lntd1t.apps.googleusercontent.com",
           "client_type": 3
         },

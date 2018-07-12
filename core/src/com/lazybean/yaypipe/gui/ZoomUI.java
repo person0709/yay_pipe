@@ -9,6 +9,7 @@ import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
+import com.lazybean.yaypipe.gamehelper.GridSize;
 import com.lazybean.yaypipe.gamehelper.IconType;
 
 public class ZoomUI extends Table {
@@ -29,8 +30,8 @@ public class ZoomUI extends Table {
         zoomOutIcon = new Icon(assetLoader, IconType.ZOOM_OUT, Icon.ITEM_DIAMETER);
         zoomOutIcon.setColor(color.r, color.g, color.b, 0.7f);
 
-        add(zoomInIcon).padRight(Value.percentWidth(0.1f));
-        add(zoomOutIcon).padRight(YayPipe.SCREEN_WIDTH*0.09f);
+        add(zoomInIcon).padRight(Value.percentWidth(0.1f)).padBottom(Value.percentHeight(0.1f));
+        add(zoomOutIcon).padRight(Value.percentWidth(0.1f)).padBottom(Value.percentHeight(0.1f));
     }
 
     @Override

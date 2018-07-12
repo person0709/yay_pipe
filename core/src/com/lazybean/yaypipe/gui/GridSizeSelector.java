@@ -129,7 +129,7 @@ public class GridSizeSelector extends Table{
                 gridSizeSlider.setValue(REGULAR);
                 break;
 
-            case EXTREME:
+            case PROFESSIONAL:
                 gridSizeSlider.setRange(REGULAR, EXTRA_LARGE);
                 gridSizeSlider.setValue(REGULAR);
                 break;

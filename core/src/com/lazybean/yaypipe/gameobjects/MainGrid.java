@@ -22,6 +22,7 @@ import com.lazybean.yaypipe.gamehelper.Difficulty;
 import com.lazybean.yaypipe.gui.Badge;
 
 import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
@@ -211,6 +212,11 @@ public class MainGrid extends Group implements Disposable{
         //handles flow stop check
         if (nextBlock.getStopNum() != 0) {
             if (nextBlock.getStopNum() == stopCount + 1) {
+                if (stopCount < difficulty.stopNum){
+                    Tween.to(badgeArray.get(stopCount + 1), SpriteAccessor.ALPHA, 0.1f).target(0f)
+                            .repeatYoyo(Tween.INFINITY, 1f)
+                            .start(tweenManager);
+                }
                 Tween.to(badgeArray.get(stopCount), SpriteAccessor.SCALE, 0.5f).target(0f).ease(Back.IN)
                         .setCallback(new TweenCallback() {
                             @Override

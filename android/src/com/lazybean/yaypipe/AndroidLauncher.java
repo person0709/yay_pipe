@@ -208,6 +208,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 
 	private void onDisconnected(){
 		Toast.makeText(this, "Signed out", Toast.LENGTH_SHORT).show();
+		hideProgressBar();
 	}
 
 	/*-----------------------------GOOGLE PLAY SERVICE-----------------------------*/

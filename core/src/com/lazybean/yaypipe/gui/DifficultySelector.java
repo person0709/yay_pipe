@@ -137,7 +137,7 @@ public class DifficultySelector extends Table{
                 return Difficulty.HARD;
 
             case EXTREME:
-                return Difficulty.EXTREME;
+                return Difficulty.PROFESSIONAL;
 
             case MASTER:
                 return Difficulty.MASTER;

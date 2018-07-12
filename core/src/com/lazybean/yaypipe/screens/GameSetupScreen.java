@@ -177,8 +177,6 @@ public class GameSetupScreen extends GameScreen{
 
     @Override
     public void show() {
-        GameData.getInstance().setUnlock(Difficulty.HARD);
-
         Gdx.input.setCatchBackKey(true);
 
         // reset page scroll pane to the first page

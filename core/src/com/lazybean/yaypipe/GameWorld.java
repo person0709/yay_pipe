@@ -156,6 +156,11 @@ public class GameWorld {
             Tween.to(grid.getBadgeArray().get(i), SpriteAccessor.SCALE, 0.5f).target(1f).ease(Elastic.OUT).delay(delay).start(tweenManager);
             delay += 0.1f;
         }
+        if (grid.getBadgeArray().size > 0) {
+            Tween.to(grid.getBadgeArray().get(0), SpriteAccessor.ALPHA, 0.1f).target(0f)
+                    .repeatYoyo(Tween.INFINITY, 0.5f)
+                    .start(tweenManager);
+        }
 
         Timeline.createParallel()
                 .push(Tween.to(grid.getStartBlock().getPipe(), SpriteAccessor.SCALE, 0.1f).target(1f).ease(Quart.OUT))
@@ -404,8 +409,8 @@ public class GameWorld {
     }
 
     public void returnToDefaultView(){
-        grid.setPosition(YayPipe.SCREEN_WIDTH / 2, YayPipe.SCREEN_HEIGHT / 2, Align.center);
-        ((OrthographicCamera)gameWorldStage.getCamera()).zoom = grid.getWidth() / YayPipe.SCREEN_WIDTH * 1.2f;
+        grid.setPosition(YayPipe.SCREEN_WIDTH / 2, YayPipe.SCREEN_HEIGHT * 0.95f / 2, Align.center);
+        ((OrthographicCamera)gameWorldStage.getCamera()).zoom = grid.getWidth() / YayPipe.SCREEN_WIDTH * 1.1f;
     }
 
     public void dispose() {

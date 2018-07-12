@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
+import com.lazybean.yaypipe.gamehelper.GridSize;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gameobjects.NextBlock;
@@ -16,6 +17,7 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Elastic;
 
 public class Gui {
     private GameWorld gameWorld;
@@ -76,7 +78,9 @@ public class Gui {
 
     private void zoomUIInit() {
         zoomUI = new ZoomUI(assetLoader, gameWorld);
-        zoomUI.setPosition(0,nextPipeUI.getTop());
+        if (gameWorld.gridSize == GridSize.TINY || gameWorld.gridSize == GridSize.SMALL){
+            return;
+        }
         guiStage.addActor(zoomUI);
     }
 
@@ -113,10 +117,14 @@ public class Gui {
 
     public void start(){
         nextPipeUI.start();
+        Timeline.createParallel()
+                .push(Tween.to(gameWorld.getGrid().getStartBlock().getPipe(), SpriteAccessor.SCALE, 0.5f).target(1f).ease(Elastic.OUT))
+                .push(Tween.to(gameWorld.getGrid().getFinishBlock().getPipe(), SpriteAccessor.SCALE, 0.5f).target(1f).ease(Elastic.OUT))
+                .start(tweenManager);
     }
 
     public void useWand(WandDrawer drawer, final WandBlock movingBlock){
-        //decease stock by 1
+        //decrease stock by 1
         int wandStock = GameData.getInstance().getWandStock() - 1;
         GameData.getInstance().setWandStock(wandStock);
         if (wandStock == 0){

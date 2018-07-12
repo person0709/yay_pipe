@@ -19,7 +19,7 @@ public class Water extends Actor {
     private final float WATER_WIDTH = GridBlock.BLOCK_LENGTH / 5f;
     private final float SAMPLE_DISTANCE = 2f;
     private final float INITIAL_SPEED = 5f;
-    private final float SPEED_INCREASE_INTERVAL = 5f;
+    private final float SPEED_INCREASE_INTERVAL = 10f;
 
     private Difficulty difficulty;
 
@@ -27,7 +27,7 @@ public class Water extends Actor {
 
     // the positions of water blobs to be drawn up until the current block from the start
     private Array<Vector2> drawingPath = new Array<>();
-    private int drawingPathNum = 0;
+    private int drawingPathNum;
 
     // the positions of water blobs to be drawn in the current block
     private Array<Vector2> animatingPath = new Array<>();

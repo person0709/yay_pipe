@@ -29,7 +29,7 @@ public class PromptWindow extends Dialog {
         noStyle.fontColor = CustomColor.RED.getColor();
 
         yes = new TextButton("YAY", yesStyle);
-        TextButton no = new TextButton("NAY", noStyle);
+        no = new TextButton("NAY", noStyle);
         setObject(no, false);
         key(Input.Keys.BACK, false);
 

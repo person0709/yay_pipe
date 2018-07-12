@@ -4,11 +4,11 @@ public enum Difficulty {
 
     TUTORIAL_ADVANCED(-1, 10, 2),
     TUTORIAL_BASIC(-1, 10, 0),
-    EASY(1, 30, 0),
-    NORMAL(2, 35, 2),
-    HARD(3, 40, 3),
-    EXTREME(4, 45, 4),
-    MASTER(5, 50, 5);
+    EASY(1, 15, 0),
+    NORMAL(2, 20, 2),
+    HARD(3, 25, 3),
+    PROFESSIONAL(4, 30, 4),
+    MASTER(5, 40, 5);
 
     public int difficultyLevel;
     public float waterSpeedLimit;

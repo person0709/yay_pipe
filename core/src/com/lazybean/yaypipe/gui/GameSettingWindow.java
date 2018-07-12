@@ -35,7 +35,7 @@ public class GameSettingWindow extends GameWindow{
     private PromptWindow promptWindow;
 
     private Icon quitIcon;
-    private TextButton googlePlayButton, save, load;
+    private TextButton googlePlayButton, save, load, credit;
 
     public GameSettingWindow(YayPipe game, Stage stage) {
         super(game.assetLoader.uiSkin);
@@ -140,6 +140,14 @@ public class GameSettingWindow extends GameWindow{
                         break;
                     }
                 }
+            }
+        });
+
+        credit = new TextButton("Credit", buttonStyle);
+        credit.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                
             }
         });
 

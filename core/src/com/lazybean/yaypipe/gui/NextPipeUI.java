@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -58,12 +60,6 @@ public class NextPipeUI extends Group {
 
         setBounds(0, 0, YayPipe.SCREEN_WIDTH, YayPipe.SCREEN_HEIGHT * 0.12f);
 
-        Background background = new Background();
-        background.setColor(CustomColor.YELLOW.getColor());
-        background.setHeight(getHeight());
-
-        addActor(background);
-
         Label.LabelStyle labelStyle = new Label.LabelStyle(assetLoader.getFont(FontType.ANJA_SMALL), Color.BLACK);
         Label label = new Label("next", labelStyle);
         redBlock = new RedBlock(assetLoader.redBlock);
@@ -108,22 +104,44 @@ public class NextPipeUI extends Group {
         nextBlockQueueGroup.setHeight(NextBlock.BLOCK_LENGTH);
         nextBlockQueueGroup.setPosition(getWidth() * 0.8f, getHeight() / 2, Align.right);
         addActor(nextBlockQueueGroup);
+
+        Actor nextPipeExpand = new Actor();
+        nextPipeExpand.setBounds(0,0, getWidth() * 0.2f, getHeight());
+        addActor(nextPipeExpand);
+
+        nextPipeExpand.addListener(new ActorGestureListener(20, 0.4f, 0.2f, 0.15f){
+            @Override
+            public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                float alpha = 1f;
+                for(int i = 0; i < blockOrderQueue.size - 1; i++){
+                    Tween.set(blockOrderQueue.get(i), SpriteAccessor.ALPHA).target(alpha).start(tweenManager);
+                    alpha -= 0.03f;
+                    gameWorld.getGui().zoomUI.setVisible(false);
+                }
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                for(int i = 1; i < blockOrderQueue.size; i++){
+                    Tween.set(blockOrderQueue.get(i), SpriteAccessor.ALPHA).target(0f).start(tweenManager);
+                    gameWorld.getGui().zoomUI.setVisible(true);
+                }
+            }
+        });
     }
 
     public void start(){
         Timeline.createParallel()
                 .push(Tween.to(blockOrderQueue.get(0), SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .push(Tween.to(blockOrderQueue.get(2), SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .push(Tween.to(blockOrderQueue.get(3), SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .push(Tween.to(blockOrderQueue.get(4), SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .push(Tween.to(blockOrderQueue.get(5), SpriteAccessor.ALPHA, 0.3f).target(1f))
-                .push(Tween.from(nextBlockQueueGroup, SpriteAccessor.POSITION, 0.3f).targetRelative(nextBlockQueueGroup.getWidth(), 0)
-                        .ease(Quad.OUT))
-                .push(Tween.to(gameWorld.getGrid().getStartBlock().getPipe(), SpriteAccessor.SCALE, 0.5f).target(1f).ease(Elastic.OUT))
-                .push(Tween.to(gameWorld.getGrid().getFinishBlock().getPipe(), SpriteAccessor.SCALE, 0.5f).target(1f).ease(Elastic.OUT))
+//                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.ALPHA, 0.3f).target(1f))
+//                .push(Tween.to(blockOrderQueue.get(2), SpriteAccessor.ALPHA, 0.3f).target(1f))
+//                .push(Tween.to(blockOrderQueue.get(3), SpriteAccessor.ALPHA, 0.3f).target(1f))
+//                .push(Tween.to(blockOrderQueue.get(4), SpriteAccessor.ALPHA, 0.3f).target(1f))
+//                .push(Tween.to(blockOrderQueue.get(5), SpriteAccessor.ALPHA, 0.3f).target(1f))
+//                .push(Tween.from(nextBlockQueueGroup, SpriteAccessor.POSITION, 0.3f).targetRelative(nextBlockQueueGroup.getWidth(), 0)
+//                        .ease(Quad.OUT))
                 .beginSequence()
-                .push(Tween.to(blockOrderQueue.first(), SpriteAccessor.POSITION, 0.3f).targetRelative(redBlock.getX() - nextBlockQueueGroup.getX() + RED_BLOCK_LINE_LENGTH, 0))
+                .push(Tween.set(blockOrderQueue.first(), SpriteAccessor.POSITION).targetRelative(redBlock.getX() - nextBlockQueueGroup.getX() + RED_BLOCK_LINE_LENGTH, 0))
                 .setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
@@ -137,14 +155,15 @@ public class NextPipeUI extends Group {
     public void setNextBlock(){
         Vector2 blockQueuePos = blockOrderQueue.get(1).localToStageCoordinates(new Vector2());
         Timeline.createParallel()
-                .push(Tween.to(blockOrderQueue.get(0), SpriteAccessor.ALPHA, 0.2f).target(0f))
-                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.POSITION, 0.2f).targetRelative(-(blockQueuePos.x - redBlock.getX() - RED_BLOCK_LINE_LENGTH),0))
+                .push(Tween.set(blockOrderQueue.get(0), SpriteAccessor.ALPHA).target(0f))
+                .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.POSITION).targetRelative(-(blockQueuePos.x - redBlock.getX() - RED_BLOCK_LINE_LENGTH),0))
+                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.ALPHA, 0.2f).target(1f))
                 .push(Tween.to(blockOrderQueue.get(2), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
                 .push(Tween.to(blockOrderQueue.get(3), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
                 .push(Tween.to(blockOrderQueue.get(4), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
                 .push(Tween.to(blockOrderQueue.get(5), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
                 .push(Tween.to(blockOrderQueue.get(6), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(6), SpriteAccessor.ALPHA, 0.2f).target(1f))
+//                .push(Tween.to(blockOrderQueue.get(6), SpriteAccessor.ALPHA, 0.2f).target(1f))
                 .setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
@@ -182,7 +201,8 @@ public class NextPipeUI extends Group {
         Vector2 blockQueuePos = blockOrderQueue.get(2).localToStageCoordinates(new Vector2());
         Timeline.createParallel()
                 .push(Tween.to(blockOrderQueue.get(0), SpriteAccessor.ALPHA, 0.2f).target(1f))
-                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.POSITION, 0.2f).targetRelative(blockQueuePos.x - redBlock.getX() - RED_BLOCK_LINE_LENGTH, 0))
+                .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.ALPHA).target(0f))
+                .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.POSITION).targetRelative(blockQueuePos.x - redBlock.getX() - RED_BLOCK_LINE_LENGTH, 0))
                 .push(Tween.to(blockOrderQueue.get(2), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))
                 .push(Tween.to(blockOrderQueue.get(3), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))
                 .push(Tween.to(blockOrderQueue.get(4), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))

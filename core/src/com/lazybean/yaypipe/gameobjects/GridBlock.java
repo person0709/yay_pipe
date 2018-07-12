@@ -67,6 +67,7 @@ public class GridBlock extends Block{
     }
 
     public void removeBadge(){
+        this.stopNum = 0;
         badge.remove();
     }
 
