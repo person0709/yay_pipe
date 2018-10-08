@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -21,7 +21,7 @@ public class GamePlayUpperBarUI extends UpperBarUI {
     private GameWorld gameWorld;
     private Score score;
 
-    private Icon pauseIcon, undoIcon, fastForwardIcon;
+    private Icon pauseIcon;
     private Label scoreNum, highScoreNum, scoreText, highScoreText;
 
     public GamePlayUpperBarUI(AssetLoader assetLoader, GameWorld gameWorld) {
@@ -38,14 +38,14 @@ public class GamePlayUpperBarUI extends UpperBarUI {
         pauseIcon.setColor(CustomColor.RED.getColor());
         controlIcons.add(pauseIcon).padLeft(YayPipe.SCREEN_WIDTH * 0.07f);
 
-        undoIcon = new Icon(assetLoader, IconType.UNDO, Icon.MENU_DIAMETER);
-        undoIcon.setColor(CustomColor.RED.getColor());
-        undoIcon.setDim(true);
-        controlIcons.add(undoIcon).padLeft(YayPipe.SCREEN_WIDTH * 0.017f);
-
-        fastForwardIcon = new Icon(assetLoader, IconType.FAST_FORWARD, Icon.MENU_DIAMETER);
-        fastForwardIcon.setColor(CustomColor.RED.getColor());
-        controlIcons.add(fastForwardIcon).padLeft(YayPipe.SCREEN_WIDTH * 0.017f);
+//        undoIcon = new Icon(assetLoader, IconType.UNDO, Icon.MENU_DIAMETER);
+//        undoIcon.setColor(CustomColor.RED.getColor());
+//        undoIcon.setDim(true);
+//        controlIcons.add(undoIcon).padLeft(YayPipe.SCREEN_WIDTH * 0.017f);
+//
+//        fastForwardIcon = new Icon(assetLoader, IconType.FAST_FORWARD, Icon.MENU_DIAMETER);
+//        fastForwardIcon.setColor(CustomColor.RED.getColor());
+//        controlIcons.add(fastForwardIcon).padLeft(YayPipe.SCREEN_WIDTH * 0.017f);
 
 
         Table scoreDisplayGroup = new Table();
@@ -97,25 +97,25 @@ public class GamePlayUpperBarUI extends UpperBarUI {
             pauseIcon.setTouched(false);
             gameWorld.pause();
         }
-        if (fastForwardIcon.isTouched()){
-            fastForwardIcon.setTouched(false);
-            fastForwardIcon.setDim(true);
-            gameWorld.getGrid().getWater().skip();
-            gameWorld.getGrid().setTouchable(Touchable.disabled);
-        }
-        if (undoIcon.isTouched()){
-            undoIcon.setTouched(false);
-
-            undoIcon.setDim(true);
-
-            gameWorld.undo();
-        }
+//        if (fastForwardIcon.isTouched()){
+//            fastForwardIcon.setTouched(false);
+//            fastForwardIcon.setDim(true);
+//            gameWorld.getGrid().getWater().skip();
+//            gameWorld.getGrid().setTouchable(Touchable.disabled);
+//        }
+//        if (undoIcon.isTouched()){
+//            undoIcon.setTouched(false);
+//
+//            undoIcon.setDim(true);
+//
+//            gameWorld.undo();
+//        }
     }
 
-    public void setUndoIcon(boolean able){
-        undoIcon.setDim(!able);
-        undoIcon.setAble(able);
-    }
+//    public void setUndoIcon(boolean able){
+//        undoIcon.setDim(!able);
+//        undoIcon.setAble(able);
+//    }
 
     private void setHighScoreText(){
         scoreText.setColor(CustomColor.RED.getColor());

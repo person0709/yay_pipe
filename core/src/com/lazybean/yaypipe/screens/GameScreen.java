@@ -4,17 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.YayPipe;
-import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
-import com.lazybean.yaypipe.gui.Background;
-import com.lazybean.yaypipe.gui.Gui;
+import com.lazybean.yaypipe.guiobjects.Background;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;

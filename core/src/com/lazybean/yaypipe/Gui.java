@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -11,6 +11,16 @@ import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gameobjects.NextBlock;
 import com.lazybean.yaypipe.gameobjects.WandBlock;
+import com.lazybean.yaypipe.guiobjects.BadgeIndicator;
+import com.lazybean.yaypipe.guiobjects.GameOverWindow;
+import com.lazybean.yaypipe.guiobjects.GamePausedWindow;
+import com.lazybean.yaypipe.guiobjects.GamePlayButtonUI;
+import com.lazybean.yaypipe.guiobjects.GamePlayUpperBarUI;
+import com.lazybean.yaypipe.guiobjects.ItemTray;
+import com.lazybean.yaypipe.guiobjects.NextPipeUI;
+import com.lazybean.yaypipe.guiobjects.TapToStart;
+import com.lazybean.yaypipe.guiobjects.WandDrawer;
+import com.lazybean.yaypipe.guiobjects.ZoomUI;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;
@@ -27,6 +37,7 @@ public class Gui {
     private Stage guiStage;
 
     public GamePlayUpperBarUI upperBarUI;
+    public GamePlayButtonUI gamePlayButtonUI;
     public NextPipeUI nextPipeUI;
     public ItemTray itemTray;
     public BadgeIndicator badgeIndicator;
@@ -44,6 +55,7 @@ public class Gui {
 
         itemTrayInit();
         upperBarUIInit();
+        gamePlayButtonUIInit();
         nextPipeUIInit();
         badgeIndicatorInit();
         zoomUIInit();
@@ -67,6 +79,11 @@ public class Gui {
     private void upperBarUIInit() {
         upperBarUI = new GamePlayUpperBarUI(assetLoader, gameWorld);
         guiStage.addActor(upperBarUI);
+    }
+
+    private void gamePlayButtonUIInit(){
+        gamePlayButtonUI = new GamePlayButtonUI(assetLoader, gameWorld);
+        guiStage.addActor(gamePlayButtonUI);
     }
 
     private void badgeIndicatorInit() {

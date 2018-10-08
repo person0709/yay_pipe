@@ -1,16 +1,12 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
-import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 

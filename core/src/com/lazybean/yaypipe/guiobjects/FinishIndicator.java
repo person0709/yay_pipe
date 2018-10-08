@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;

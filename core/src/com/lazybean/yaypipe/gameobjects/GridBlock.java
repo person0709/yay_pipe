@@ -1,14 +1,12 @@
 package com.lazybean.yaypipe.gameobjects;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.lazybean.yaypipe.YayPipe;
-import com.lazybean.yaypipe.gui.Badge;
+import com.lazybean.yaypipe.guiobjects.Badge;
 
 public class GridBlock extends Block{
     public static final float BLOCK_LENGTH = YayPipe.SCREEN_WIDTH * 0.1f;

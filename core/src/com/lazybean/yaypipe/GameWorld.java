@@ -25,8 +25,7 @@ import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gamehelper.gamedata.Statistics;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
 import com.lazybean.yaypipe.gameobjects.GridBlock;
-import com.lazybean.yaypipe.gui.FinishIndicator;
-import com.lazybean.yaypipe.gui.Gui;
+import com.lazybean.yaypipe.guiobjects.FinishIndicator;
 import com.lazybean.yaypipe.gameobjects.MainGrid;
 import com.lazybean.yaypipe.gamehelper.Score;
 
@@ -202,7 +201,7 @@ public class GameWorld {
             addPoints(blockToBeChanged, Score.ScoreType.PIPE_CHANGE);
         }
 
-        gui.upperBarUI.setUndoIcon(true);
+        gui.gamePlayButtonUI.undo.setDisabled(false);
 
         //statistics handle
         GameData.getInstance().statistics.incrementValue(StatisticsType.TOTAL_PIPE, 1);
@@ -304,8 +303,6 @@ public class GameWorld {
     public void undo() {
         //statistics handle
         GameData.getInstance().statistics.addUndoCount();
-
-        gui.upperBarUI.setUndoIcon(false);
 
         final GridBlock blockToBeChanged = grid.getGridBlockArray().get((int) undoBlockPos.y).get((int) undoBlockPos.x);
 

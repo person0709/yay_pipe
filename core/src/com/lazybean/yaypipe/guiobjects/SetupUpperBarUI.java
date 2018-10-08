@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,6 +22,7 @@ public class SetupUpperBarUI extends UpperBarUI {
 
     public NumberAnimator coinAnimator;
     private Label balance;
+    private Label highscoreValue;
 
     public Icon backIcon;
 
@@ -49,13 +50,13 @@ public class SetupUpperBarUI extends UpperBarUI {
         label.setColor(Color.BLACK);
         label.setAlignment(Align.right);
 
-        Label value = new Label(String.valueOf(GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)),
+        highscoreValue = new Label(String.valueOf(GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)),
                 assetLoader.uiSkin, "setupUpperUIValue");
-        value.setColor(Color.BLACK);
-        value.setAlignment(Align.right);
+        highscoreValue.setColor(Color.BLACK);
+        highscoreValue.setAlignment(Align.right);
 
         highScore.add(label).height(label.getHeight()*0.6f).padTop(label.getHeight()*0.5f).row();
-        highScore.add(value).align(Align.right);
+        highScore.add(highscoreValue).align(Align.right);
 
         Table coinBalance = new Table();
         //scoreDisplayGroup.setDebug(true);
@@ -92,6 +93,7 @@ public class SetupUpperBarUI extends UpperBarUI {
         super.act(delta);
         coinAnimator.update(delta);
         balance.setText(String.valueOf(coinAnimator.getCurrentNum()));
+        highscoreValue.setText(String.valueOf(GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)));
 
         if (backIcon.isTouched()){
             backIcon.setTouched(false);

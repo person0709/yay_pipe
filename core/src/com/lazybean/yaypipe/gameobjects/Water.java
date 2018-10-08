@@ -1,6 +1,5 @@
 package com.lazybean.yaypipe.gameobjects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,7 +11,7 @@ import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.Difficulty;
 import com.lazybean.yaypipe.gamehelper.Direction;
 import com.lazybean.yaypipe.gamehelper.PathLoader;
-import com.lazybean.yaypipe.gui.SnailEffect;
+import com.lazybean.yaypipe.guiobjects.SnailEffect;
 
 public class Water extends Actor {
     private final Color WATER_COLOR = CustomColor.TURQUOISE.getColor();

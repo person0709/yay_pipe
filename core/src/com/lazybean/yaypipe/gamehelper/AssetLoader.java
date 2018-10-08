@@ -10,17 +10,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.lazybean.yaypipe.YayPipe;
-import com.lazybean.yaypipe.gui.Background;
 
 
 public final class AssetLoader {
@@ -47,7 +43,7 @@ public final class AssetLoader {
     public TextureRegion shadow;
     public TextureRegion line;
 
-    public NinePatchDrawable button, window, itemTray;
+    public NinePatchDrawable buttonUp, buttonDown, buttonDisabled, window, itemTray;
 
     public TextureRegion waterDrop;
 
@@ -142,7 +138,9 @@ public final class AssetLoader {
         e = new TextureRegion(imageAtlas.findRegion("e"));
         itemTray = new NinePatchDrawable(imageAtlas.createPatch("itemTray"));
         window = new NinePatchDrawable(imageAtlas.createPatch("window"));
-        button = new NinePatchDrawable(imageAtlas.createPatch("button"));
+        buttonUp = new NinePatchDrawable(imageAtlas.createPatch("buttonUp"));
+        buttonDown = new NinePatchDrawable(imageAtlas.createPatch("buttonDown"));
+        buttonDisabled = new NinePatchDrawable(buttonUp).tint(Color.LIGHT_GRAY);
 
         iconAtlas = manager.get("asset_icon.atlas");
 
@@ -157,7 +155,9 @@ public final class AssetLoader {
         uiSkin = new Skin();
 
         TextButton.TextButtonStyle menuButtonStyle = new TextButton.TextButtonStyle();
-        menuButtonStyle.up = button;
+        menuButtonStyle.up = buttonUp;
+        menuButtonStyle.down = buttonDown;
+        menuButtonStyle.disabled = buttonDisabled;
         menuButtonStyle.font = getFont(FontType.ANJA_MEDIUM);
         menuButtonStyle.fontColor = Color.BLACK;
         menuButtonStyle.pressedOffsetY = -10;

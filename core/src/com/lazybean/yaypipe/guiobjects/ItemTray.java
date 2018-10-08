@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;

@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -79,7 +79,7 @@ public class GameSettingWindow extends GameWindow{
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.font = assetLoader.getFont(FontType.ANJA_MEDIUM_SMALL);
         buttonStyle.fontColor = Color.BLACK;
-        buttonStyle.up = assetLoader.button;
+        buttonStyle.up = assetLoader.buttonUp;
         buttonStyle.pressedOffsetY = -5f;
 
         Window.WindowStyle windowStyle = new Window.WindowStyle(assetLoader.getFont(FontType.ANJA_SMALL), Color.BLACK, assetLoader.window);
@@ -198,21 +198,21 @@ public class GameSettingWindow extends GameWindow{
             if (YayPipe.playService.isSignedIn()) {
                 googlePlayButton.setText("Connected");
                 save.setTouchable(Touchable.enabled);
-                save.setColor(0,0,0,1f);
+                save.setColor(1,1,1,1f);
                 load.setTouchable(Touchable.enabled);
-                load.setColor(0,0,0,1f);
+                load.setColor(1,1,1,1f);
             } else {
                 googlePlayButton.setText("Disconnected");
                 save.setTouchable(Touchable.disabled);
-                save.setColor(0,0,0,0.5f);
+                save.setColor(1,1,1,0.5f);
                 load.setTouchable(Touchable.disabled);
-                load.setColor(0,0,0,0.5f);
+                load.setColor(1,1,1,0.5f);
             }
         } else {
             save.setTouchable(Touchable.disabled);
-            save.setColor(0,0,0,0.5f);
+            save.setColor(1,1,1,0.5f);
             load.setTouchable(Touchable.disabled);
-            load.setColor(0,0,0,0.5f);
+            load.setColor(1,1,1,0.5f);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -12,12 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.utils.Queue;
 import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.CustomColor;
 import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.PipeType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
@@ -30,8 +27,6 @@ import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
-import aurelienribon.tweenengine.equations.Elastic;
-import aurelienribon.tweenengine.equations.Quad;
 
 public class NextPipeUI extends Group {
     public final static float RED_BLOCK_LENGTH = GridBlock.BLOCK_LENGTH * 1.57f;
@@ -58,12 +53,12 @@ public class NextPipeUI extends Group {
 
         nextBlockQueueGroup = new Group();
 
-        setBounds(0, 0, YayPipe.SCREEN_WIDTH, YayPipe.SCREEN_HEIGHT * 0.12f);
+        setBounds(0, 0, RED_BLOCK_LENGTH * 1.5f, YayPipe.SCREEN_HEIGHT * 0.6f);
 
         Label.LabelStyle labelStyle = new Label.LabelStyle(assetLoader.getFont(FontType.ANJA_SMALL), Color.BLACK);
         Label label = new Label("next", labelStyle);
         redBlock = new RedBlock(assetLoader.redBlock);
-        redBlock.setPosition(getWidth() * 0.1f, getHeight() / 2, Align.center);
+        redBlock.setPosition(getWidth() / 2, redBlock.getHeight() * 0.1f, Align.bottom);
         label.setPosition(redBlock.getX() + redBlock.getWidth() / 2, redBlock.getTop(), Align.bottom);
         addActor(redBlock);
         addActor(label);
@@ -91,32 +86,33 @@ public class NextPipeUI extends Group {
 
         for (int i = 0; i < 7; i++) {
             NextBlock block = assetLoader.blockFactory.obtainNextBlock();
+            block.setColor(Color.LIGHT_GRAY);
             PipeType nextPipeType = nextPipeList.pop();
             block.setPipe(assetLoader.getPipeImage(nextPipeType), nextPipeType);
             blockOrderQueue.add(block);
-            block.setPosition(i * (block.getWidth() + NextBlock.BLOCK_GAP) ,0);
+            block.setPosition(0,i * (block.getWidth() + NextBlock.BLOCK_GAP));
 
             Tween.set(block, SpriteAccessor.ALPHA).target(0f).start(tweenManager);
             nextBlockQueueGroup.addActor(block);
         }
 
-        nextBlockQueueGroup.setWidth((NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP) * 5);
-        nextBlockQueueGroup.setHeight(NextBlock.BLOCK_LENGTH);
-        nextBlockQueueGroup.setPosition(getWidth() * 0.8f, getHeight() / 2, Align.right);
+        nextBlockQueueGroup.setHeight((NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP) * 5);
+        nextBlockQueueGroup.setWidth(NextBlock.BLOCK_LENGTH);
+        nextBlockQueueGroup.setPosition(getWidth() / 2, redBlock.getHeight(), Align.bottom);
         addActor(nextBlockQueueGroup);
 
         Actor nextPipeExpand = new Actor();
-        nextPipeExpand.setBounds(0,0, getWidth() * 0.2f, getHeight());
+        nextPipeExpand.setBounds(0,0, getWidth(), RED_BLOCK_LENGTH);
         addActor(nextPipeExpand);
 
         nextPipeExpand.addListener(new ActorGestureListener(20, 0.4f, 0.2f, 0.15f){
             @Override
             public void touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                float alpha = 1f;
-                for(int i = 0; i < blockOrderQueue.size - 1; i++){
-                    Tween.set(blockOrderQueue.get(i), SpriteAccessor.ALPHA).target(alpha).start(tweenManager);
-                    alpha -= 0.03f;
-                    gameWorld.getGui().zoomUI.setVisible(false);
+                Color color = new Color(Color.GRAY);
+                for(int i = blockOrderQueue.size - 1; i > 0; i--){
+                    color.add(0.07f,0.07f,0.07f,0);
+                    blockOrderQueue.get(i).setColor(color);
+                    Tween.set(blockOrderQueue.get(i), SpriteAccessor.ALPHA).target(1).start(tweenManager);
                 }
             }
 
@@ -124,13 +120,13 @@ public class NextPipeUI extends Group {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 for(int i = 1; i < blockOrderQueue.size; i++){
                     Tween.set(blockOrderQueue.get(i), SpriteAccessor.ALPHA).target(0f).start(tweenManager);
-                    gameWorld.getGui().zoomUI.setVisible(true);
                 }
             }
         });
     }
 
     public void start(){
+        blockOrderQueue.get(0).setColor(Color.WHITE);
         Timeline.createParallel()
                 .push(Tween.to(blockOrderQueue.get(0), SpriteAccessor.ALPHA, 0.3f).target(1f))
 //                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.ALPHA, 0.3f).target(1f))
@@ -141,7 +137,7 @@ public class NextPipeUI extends Group {
 //                .push(Tween.from(nextBlockQueueGroup, SpriteAccessor.POSITION, 0.3f).targetRelative(nextBlockQueueGroup.getWidth(), 0)
 //                        .ease(Quad.OUT))
                 .beginSequence()
-                .push(Tween.set(blockOrderQueue.first(), SpriteAccessor.POSITION).targetRelative(redBlock.getX() - nextBlockQueueGroup.getX() + RED_BLOCK_LINE_LENGTH, 0))
+                .push(Tween.set(blockOrderQueue.first(), SpriteAccessor.POSITION).targetRelative(0, redBlock.getY() - nextBlockQueueGroup.getY() + RED_BLOCK_LINE_LENGTH))
                 .setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {
@@ -156,13 +152,18 @@ public class NextPipeUI extends Group {
         Vector2 blockQueuePos = blockOrderQueue.get(1).localToStageCoordinates(new Vector2());
         Timeline.createParallel()
                 .push(Tween.set(blockOrderQueue.get(0), SpriteAccessor.ALPHA).target(0f))
-                .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.POSITION).targetRelative(-(blockQueuePos.x - redBlock.getX() - RED_BLOCK_LINE_LENGTH),0))
-                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.ALPHA, 0.2f).target(1f))
-                .push(Tween.to(blockOrderQueue.get(2), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(3), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(4), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(5), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(6), SpriteAccessor.POSITION, 0.2f).targetRelative(-NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP, 0))
+                .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.POSITION).targetRelative(0, -(blockQueuePos.y - redBlock.getY() - RED_BLOCK_LINE_LENGTH)))
+                .push(Tween.to(blockOrderQueue.get(1), SpriteAccessor.ALPHA, 0.2f).target(1f).setCallback(new TweenCallback() {
+                    @Override
+                    public void onEvent(int type, BaseTween<?> source) {
+                        blockOrderQueue.get(1).setColor(Color.WHITE);
+                    }
+                }).setCallbackTriggers(TweenCallback.START))
+                .push(Tween.set(blockOrderQueue.get(2), SpriteAccessor.POSITION).targetRelative(0, -NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(3), SpriteAccessor.POSITION).targetRelative(0, -NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(4), SpriteAccessor.POSITION).targetRelative(0, -NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(5), SpriteAccessor.POSITION).targetRelative(0, -NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(6), SpriteAccessor.POSITION).targetRelative(0, -NextBlock.BLOCK_LENGTH - NextBlock.BLOCK_GAP))
 //                .push(Tween.to(blockOrderQueue.get(6), SpriteAccessor.ALPHA, 0.2f).target(1f))
                 .setCallback(new TweenCallback() {
                     @Override
@@ -173,6 +174,7 @@ public class NextPipeUI extends Group {
                         undoBlock.remove();
 
                         NextBlock block = assetLoader.blockFactory.obtainNextBlock();
+                        block.setColor(Color.LIGHT_GRAY);
                         if (nextPipeList.size == 0){
                             nextPipeList.addAll(PipeType.LEFT_RIGHT, PipeType.TOP_BOTTOM, PipeType.LEFT_BOTTOM, PipeType.LEFT_TOP,
                                     PipeType.RIGHT_BOTTOM, PipeType.RIGHT_TOP, PipeType.ALL_DIRECTION);
@@ -182,7 +184,7 @@ public class NextPipeUI extends Group {
                         PipeType pipeType = nextPipeList.pop();
                         block.setPipe(assetLoader.getPipeImage(pipeType), pipeType);
 
-                        block.setPosition(blockOrderQueue.peek().getX() + block.getWidth() + GridBlock.BLOCK_GAP, 0);
+                        block.setPosition(0, blockOrderQueue.peek().getY() + block.getWidth() + GridBlock.BLOCK_GAP);
                         blockOrderQueue.add(block);
 
                         Color color = blockOrderQueue.peek().getColor();
@@ -202,13 +204,13 @@ public class NextPipeUI extends Group {
         Timeline.createParallel()
                 .push(Tween.to(blockOrderQueue.get(0), SpriteAccessor.ALPHA, 0.2f).target(1f))
                 .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.ALPHA).target(0f))
-                .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.POSITION).targetRelative(blockQueuePos.x - redBlock.getX() - RED_BLOCK_LINE_LENGTH, 0))
-                .push(Tween.to(blockOrderQueue.get(2), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(3), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(4), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(5), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(6), SpriteAccessor.POSITION, 0.2f).targetRelative(NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP, 0))
-                .push(Tween.to(blockOrderQueue.get(6), SpriteAccessor.ALPHA, 0.2f).target(0f))
+                .push(Tween.set(blockOrderQueue.get(1), SpriteAccessor.POSITION).targetRelative(0, blockQueuePos.y - redBlock.getY() - RED_BLOCK_LINE_LENGTH))
+                .push(Tween.set(blockOrderQueue.get(2), SpriteAccessor.POSITION).targetRelative(0, NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(3), SpriteAccessor.POSITION).targetRelative(0, NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(4), SpriteAccessor.POSITION).targetRelative(0, NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(5), SpriteAccessor.POSITION).targetRelative(0, NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(6), SpriteAccessor.POSITION).targetRelative(0, NextBlock.BLOCK_LENGTH + NextBlock.BLOCK_GAP))
+                .push(Tween.set(blockOrderQueue.get(6), SpriteAccessor.ALPHA).target(0f))
                 .setCallback(new TweenCallback() {
                     @Override
                     public void onEvent(int type, BaseTween<?> source) {

@@ -15,9 +15,7 @@ import com.lazybean.yaypipe.gamehelper.GridSize;
 import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
-import com.lazybean.yaypipe.gui.Gui;
-
-import aurelienribon.tweenengine.Timeline;
+import com.lazybean.yaypipe.Gui;
 
 public class GamePlayScreen extends GameScreen {
     private AssetLoader assetLoader;

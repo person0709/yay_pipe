@@ -32,10 +32,10 @@ import com.lazybean.yaypipe.gamehelper.SoundType;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.StatisticsType;
-import com.lazybean.yaypipe.gui.GameSettingWindow;
-import com.lazybean.yaypipe.gui.Icon;
+import com.lazybean.yaypipe.guiobjects.GameSettingWindow;
+import com.lazybean.yaypipe.guiobjects.Icon;
 import com.lazybean.yaypipe.YayPipe;
-import com.lazybean.yaypipe.gui.QuitWindow;
+import com.lazybean.yaypipe.guiobjects.QuitWindow;
 
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Timeline;

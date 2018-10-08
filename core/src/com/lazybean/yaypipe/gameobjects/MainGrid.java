@@ -19,10 +19,9 @@ import com.lazybean.yaypipe.gamehelper.PipeType;
 import com.lazybean.yaypipe.gamehelper.Score;
 import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gamehelper.Difficulty;
-import com.lazybean.yaypipe.gui.Badge;
+import com.lazybean.yaypipe.guiobjects.Badge;
 
 import aurelienribon.tweenengine.BaseTween;
-import aurelienribon.tweenengine.Timeline;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
@@ -274,7 +273,7 @@ public class MainGrid extends Group implements Disposable{
         currentWaterBlock = nextBlock;
 
         if (gameWorld.getUndoBlockPos().x == nextBlock.getPosX() && gameWorld.getUndoBlockPos().y == nextBlock.getPosY()) {
-            gameWorld.getGui().upperBarUI.setUndoIcon(false);
+            gameWorld.getGui().gamePlayButtonUI.undo.setDisabled(true);
         }
     }
 

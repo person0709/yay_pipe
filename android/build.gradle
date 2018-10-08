@@ -10,8 +10,8 @@ android {
             storePassword 'jeff0709'
         }
     }
-    buildToolsVersion '28.0.0'
-    compileSdkVersion 27
+    buildToolsVersion '28.0.2'
+    compileSdkVersion 28
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId "com.lazybean.yaypipe"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 28
         multiDexEnabled true
     }
     buildTypes {

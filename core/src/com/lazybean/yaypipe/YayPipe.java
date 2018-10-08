@@ -19,7 +19,7 @@ import com.lazybean.yaypipe.gamehelper.SpriteAccessor;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.gamehelper.PathLoader;
 import com.lazybean.yaypipe.gamehelper.PlayService;
-import com.lazybean.yaypipe.gui.Background;
+import com.lazybean.yaypipe.guiobjects.Background;
 
 import aurelienribon.tweenengine.Tween;
 
@@ -65,16 +65,17 @@ public class YayPipe extends Game {
         fadeInOut.setColor(Color.BLACK);
         fadeInOut.setAlpha(0f);
 
-        stage.addActor(fadeInOut);
-
         assetLoader = new AssetLoader();
 
         PathLoader.load();
         assetLoader.manager.load("splash_logo.png", Texture.class);
         assetLoader.manager.finishLoading();
 
+        stage.addActor(fadeInOut);
+
         screenManager = new ScreenManager(this);
-        this.setScreenWithFadeInOut(screenManager.getSplashScreen());
+//        this.setScreenWithFadeInOut(screenManager.getSplashScreen());
+        setScreen(screenManager.getSplashScreen());
 	}
 
 	@Override

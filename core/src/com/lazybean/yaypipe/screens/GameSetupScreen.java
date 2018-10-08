@@ -19,15 +19,14 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
-import com.lazybean.yaypipe.gamehelper.Difficulty;
 import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
-import com.lazybean.yaypipe.gui.DifficultySelector;
-import com.lazybean.yaypipe.gui.GridSizeSelector;
-import com.lazybean.yaypipe.gui.ItemSelector;
-import com.lazybean.yaypipe.gui.PageScrollPane;
-import com.lazybean.yaypipe.gui.PromptWindow;
-import com.lazybean.yaypipe.gui.SetupUpperBarUI;
+import com.lazybean.yaypipe.guiobjects.DifficultySelector;
+import com.lazybean.yaypipe.guiobjects.GridSizeSelector;
+import com.lazybean.yaypipe.guiobjects.ItemSelector;
+import com.lazybean.yaypipe.guiobjects.PageScrollPane;
+import com.lazybean.yaypipe.guiobjects.PromptWindow;
+import com.lazybean.yaypipe.guiobjects.SetupUpperBarUI;
 
 public class GameSetupScreen extends GameScreen{
     private AssetLoader assetLoader;
@@ -38,6 +37,8 @@ public class GameSetupScreen extends GameScreen{
     public DifficultySelector difficultySelector;
     public GridSizeSelector gridSizeSelector;
     public ItemSelector itemSelector;
+
+    private SetupUpperBarUI upperBarUI;
 
     public TextButton next, back, start;
 
@@ -55,7 +56,7 @@ public class GameSetupScreen extends GameScreen{
         table.align(Align.center);
         table.setFillParent(true);
 
-        SetupUpperBarUI upperBarUI = new SetupUpperBarUI(assetLoader, game);
+        upperBarUI = new SetupUpperBarUI(assetLoader, game);
         stage.addActor(upperBarUI);
 
         Label setupLabel = new Label("SETUP", assetLoader.uiSkin, "setupTitle");
@@ -104,7 +105,8 @@ public class GameSetupScreen extends GameScreen{
         TextButtonStyle textButtonStyle = new TextButtonStyle();
         textButtonStyle.font = assetLoader.getFont(FontType.ANJA_MEDIUM);
         textButtonStyle.fontColor = Color.BLACK;
-        textButtonStyle.up = assetLoader.button;
+        textButtonStyle.up = assetLoader.buttonUp;
+        textButtonStyle.down = assetLoader.buttonDown;
         textButtonStyle.pressedOffsetY = -5;
         textButtonStyle.pressedOffsetX = 5;
 
@@ -186,6 +188,7 @@ public class GameSetupScreen extends GameScreen{
         start.setVisible(false);
 
         itemSelector.update();
+
 
         Gdx.input.setInputProcessor(multiplexer);
     }

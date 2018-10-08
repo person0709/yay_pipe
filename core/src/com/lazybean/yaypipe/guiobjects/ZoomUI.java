@@ -1,4 +1,4 @@
-package com.lazybean.yaypipe.gui;
+package com.lazybean.yaypipe.guiobjects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,7 +9,6 @@ import com.lazybean.yaypipe.GameWorld;
 import com.lazybean.yaypipe.YayPipe;
 import com.lazybean.yaypipe.gamehelper.AssetLoader;
 import com.lazybean.yaypipe.gamehelper.CustomColor;
-import com.lazybean.yaypipe.gamehelper.GridSize;
 import com.lazybean.yaypipe.gamehelper.IconType;
 
 public class ZoomUI extends Table {

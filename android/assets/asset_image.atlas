@@ -2,7 +2,7 @@
 asset_image.png
 size: 1024,512
 format: RGBA8888
-filter: Nearest,Linear
+filter: Nearest,Nearest
 repeat: none
 a
   rotate: false
@@ -18,13 +18,22 @@ animation_water
   orig: 64, 64
   offset: 0, 0
   index: -1
-button
+buttonDown
   rotate: false
-  xy: 870, 284
-  size: 66, 66
-  split: 30, 30, 30, 30
-  pad: 0, 0, 0, 0
-  orig: 66, 66
+  xy: 870, 281
+  size: 69, 69
+  split: 31, 31, 31, 31
+  pad: 15, 15, 12, 12
+  orig: 69, 69
+  offset: 0, 0
+  index: -1
+buttonUp
+  rotate: false
+  xy: 941, 264
+  size: 78, 84
+  split: 36, 36, 39, 39
+  pad: 12, 15, 13, 19
+  orig: 78, 84
   offset: 0, 0
   index: -1
 coin
@@ -115,35 +124,35 @@ pipe_be
   index: -1
 pipe_lr
   rotate: false
-  xy: 403, 94
+  xy: 607, 21
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_lrtb
   rotate: false
-  xy: 607, 123
+  xy: 403, 94
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_rb
   rotate: false
-  xy: 505, 21
+  xy: 763, 143
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_re
   rotate: false
-  xy: 763, 143
+  xy: 505, 21
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
   index: -1
 pipe_tb
   rotate: false
-  xy: 607, 21
+  xy: 607, 123
   size: 100, 100
   orig: 100, 100
   offset: 0, 0
@@ -157,9 +166,9 @@ redBlock
   index: -1
 shadow
   rotate: false
-  xy: 709, 175
-  size: 32, 48
-  orig: 32, 48
+  xy: 1011, 435
+  size: 6, 71
+  orig: 6, 71
   offset: 0, 0
   index: -1
 slider
