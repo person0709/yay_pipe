@@ -10,7 +10,7 @@ android {
             storePassword 'jeff0709'
         }
     }
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
     compileSdkVersion 28
     sourceSets {
         main {
@@ -34,8 +34,8 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.config
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
         }

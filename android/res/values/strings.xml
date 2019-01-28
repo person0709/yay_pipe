@@ -2,5 +2,7 @@
 <resources>
 
     <string name="app_name">Yay!Pipe</string>
+    <string name="admob_id">ca-app-pub-7109335218682097~5583820567</string>
+    <string name="restart_ad_id">ca-app-pub-7109335218682097/7060553760</string>
 
 </resources>

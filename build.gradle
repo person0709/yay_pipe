@@ -1,14 +1,13 @@
 buildscript {
     repositories {
-        mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
         google()
     }
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:3.2.0'
-        classpath 'com.google.gms:google-services:4.0.1'
+        classpath 'com.android.tools.build:gradle:3.3.0'
+        classpath 'com.google.gms:google-services:4.2.0'
     }
 }
 
@@ -25,7 +24,7 @@ allprojects {
 
     repositories {
         google()
-        mavenCentral()
+        jcenter()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
@@ -69,13 +68,13 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
         implementation fileTree(dir: '../libs', include: '*.jar')
-        implementation "com.google.android.gms:play-services-drive:15.0.1"
-        implementation "com.google.android.gms:play-services-games:15.0.1"
-        implementation "com.google.android.gms:play-services-analytics:16.0.1"
-        implementation "com.google.android.gms:play-services-base:15.0.1"
-        implementation "com.google.android.gms:play-services-auth:15.0.1"
-        implementation "com.google.android.gms:play-services-ads:15.0.1"
-        implementation 'com.google.firebase:firebase-core:16.0.1'
+        implementation "com.google.android.gms:play-services-drive:16.0.0"
+        implementation "com.google.android.gms:play-services-games:16.0.0"
+        implementation "com.google.android.gms:play-services-analytics:16.0.6"
+        implementation "com.google.android.gms:play-services-base:16.1.0"
+        implementation "com.google.android.gms:play-services-auth:16.0.1"
+        implementation "com.google.android.gms:play-services-ads:17.1.2"
+        implementation 'com.google.firebase:firebase-core:16.0.6'
         implementation 'com.android.support:multidex:1.0.3'
     }
 }

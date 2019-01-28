@@ -36,9 +36,9 @@ public class GameSetupScreen extends GameScreen{
     private PageScrollPane pageScrollPane;
     public DifficultySelector difficultySelector;
     public GridSizeSelector gridSizeSelector;
-    public ItemSelector itemSelector;
+    private ItemSelector itemSelector;
 
-    private SetupUpperBarUI upperBarUI;
+    public SetupUpperBarUI upperBarUI;
 
     public TextButton next, back, start;
 
@@ -188,6 +188,7 @@ public class GameSetupScreen extends GameScreen{
         start.setVisible(false);
 
         itemSelector.update();
+        upperBarUI.update();
 
 
         Gdx.input.setInputProcessor(multiplexer);
@@ -213,7 +214,6 @@ public class GameSetupScreen extends GameScreen{
 
     @Override
     public void resume() {
-
     }
 
     @Override

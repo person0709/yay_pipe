@@ -93,11 +93,16 @@ public class SetupUpperBarUI extends UpperBarUI {
         super.act(delta);
         coinAnimator.update(delta);
         balance.setText(String.valueOf(coinAnimator.getCurrentNum()));
-        highscoreValue.setText(String.valueOf(GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)));
 
         if (backIcon.isTouched()){
             backIcon.setTouched(false);
             game.setScreenWithFadeInOut(game.screenManager.getMainMenuScreen());
         }
+    }
+
+    public void update(){
+        coinAnimator.setTargetNum(GameData.getInstance().getCoin());
+        balance.setText(String.valueOf(coinAnimator.getCurrentNum()));
+        highscoreValue.setText(String.valueOf(GameData.getInstance().statistics.get(StatisticsType.HIGHSCORE_ALL)));
     }
 }

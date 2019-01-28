@@ -14,9 +14,10 @@ import com.lazybean.yaypipe.gamehelper.FontType;
 import com.lazybean.yaypipe.gamehelper.IconType;
 import com.lazybean.yaypipe.gamehelper.gamedata.GameData;
 import com.lazybean.yaypipe.screens.GameScreen;
+import com.lazybean.yaypipe.screens.GameSetupScreen;
 
 public class ItemSelector extends Table{
-    private GameScreen screen;
+    private GameSetupScreen screen;
 
     private int snailStock;
     private int wandStock;
@@ -26,7 +27,7 @@ public class ItemSelector extends Table{
     private Icon snailIcon;
     private Badge snailStockBadge;
 
-    public ItemSelector(AssetLoader assetLoader, GameScreen screen){
+    public ItemSelector(AssetLoader assetLoader, GameSetupScreen screen){
         this.screen = screen;
 
         Label itemLabel = new Label("ITEMS", assetLoader.uiSkin, "setupSubtitle");
@@ -109,6 +110,7 @@ public class ItemSelector extends Table{
                 wandStock++;
                 GameData.getInstance().setWandStock(wandStock);
                 GameData.getInstance().addCoin(-WandDrawer.PRICE);
+                screen.upperBarUI.update();
 
                 wandStockBadge.setBadgeLabel("x" + String.valueOf(wandStock));
                 wandStockBadge.setVisible(true);
@@ -128,6 +130,7 @@ public class ItemSelector extends Table{
                 snailStock++;
                 GameData.getInstance().setSnailStock(snailStock);
                 GameData.getInstance().addCoin(-SnailEffect.PRICE);
+                screen.upperBarUI.update();
 
                 snailStockBadge.setBadgeLabel("x" + String.valueOf(snailStock));
                 snailStockBadge.setVisible(true);
@@ -154,12 +157,18 @@ public class ItemSelector extends Table{
         if (snailStock == 0){
             snailIcon.setDim(true);
             snailStockBadge.setVisible(false);
+        } else{
+            snailIcon.setDim(false);
+            snailStockBadge.setVisible(true);
         }
 
         wandStockBadge.setBadgeLabel("x" + String.valueOf(wandStock));
         if (wandStock == 0){
             wandIcon.setDim(true);
             wandStockBadge.setVisible(false);
+        } else {
+            wandIcon.setDim(false);
+            wandStockBadge.setVisible(true);
         }
     }
 }

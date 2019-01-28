@@ -20,6 +20,7 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -98,8 +99,9 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 		});
 
 		//AdMob settings
+		MobileAds.initialize(this, getString(R.string.admob_id));
 		interstitialAd = new InterstitialAd(this);
-		interstitialAd.setAdUnitId("ca-app-pub-7109335218682097/7060553760");
+		interstitialAd.setAdUnitId(getString(R.string.restart_ad_id));
 		interstitialAd.setAdListener(new AdListener() {
 			@Override
 			public void onAdLoaded() {
@@ -490,7 +492,7 @@ public class AndroidLauncher extends AndroidApplication implements PlayService, 
 	@Override
 	public void loadAd() {
 		AdRequest adRequest = new AdRequest.Builder()
-				.addTestDevice("3DED1D914666A69149B6A2E896C2661D")
+				.addTestDevice("9C551C797DB8BFB11C1585E779FCA78E")
 				.build();
 		interstitialAd.loadAd(adRequest);
 	}

@@ -372,11 +372,6 @@ public class MainMenuScreen extends GameScreen{
 
             }
         }
-
-//        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-//        shapeRenderer.rectLine(0, dropStartPos.y, Gdx.graphics.getWidth(), dropStartPos.y, 5);
-//        shapeRenderer.rectLine(dropStartPos.x, 0, dropStartPos.x, Gdx.graphics.getHeight(), 5);
-//        shapeRenderer.end();
     }
 
     @Override
